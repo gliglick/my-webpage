@@ -3,177 +3,120 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<style>html,body{margin:0;padding:0;background:#0e1116}</style>
+<style>html,body{margin:0;padding:0;background:#000000}</style>
 <title>MX 편성나침반</title>
 <style>
-  .page-shell {
-    color-scheme: light;
-    --page:           #f2f4f8;
-    --surface-1:      #ffffff;
-    --surface-2:      #f7f8fb;
-    --text-primary:   #171a21;
-    --text-secondary: #4a5160;
-    --text-muted:     #868fa0;
-    --grid:           #e3e7ee;
-    --axis:           #c7ccd8;
-    --border:         rgba(23,26,33,0.09);
-    --series-rating:  #1d6fa5;
-    --series-rating-fill: rgba(29,111,165,0.12);
-    --series-rank:    #c1721e;
-    --series-rank-fill: rgba(193,114,30,0.12);
-    --up-red:         #bf3b3b;
-    --down-blue:      #2e5c99;
-    --chip-up-bg:     rgba(191,59,59,0.10);
-    --chip-down-bg:   rgba(46,92,153,0.10);
-    --series-3:       #1f8f7f;
-    --series-3-fill:  rgba(31,143,127,0.12);
-    --series-4:       #a98426;
-    --series-5:       #a14d74;
-    --series-6:       #4b7a3e;
-    --series-7:       #6c5b9e;
-    --series-8:       #b14a3b;
-  }
-  @media (prefers-color-scheme: dark) {
-    :root:where(:not([data-theme="light"])) .page-shell {
-      color-scheme: dark;
-      --page:           #0e1116;
-      --surface-1:      #171b22;
-      --surface-2:      #1d222b;
-      --text-primary:   #f3f5f8;
-      --text-secondary: #c3c9d4;
-      --text-muted:     #8890a0;
-      --grid:           #2a2f3a;
-      --axis:           #3a4150;
-      --border:         rgba(255,255,255,0.10);
-      --series-rating:  #4c9bdb;
-      --series-rating-fill: rgba(76,155,219,0.18);
-      --series-rank:    #e2954c;
-      --series-rank-fill: rgba(226,149,76,0.18);
-      --up-red:         #e2696a;
-      --down-blue:      #6c9bde;
-      --chip-up-bg:     rgba(226,105,106,0.15);
-      --chip-down-bg:   rgba(108,155,222,0.15);
-      --series-3:       #3fb39e;
-      --series-3-fill:  rgba(63,179,158,0.18);
-      --series-4:       #d3ab4c;
-      --series-5:       #c97ba0;
-      --series-6:       #7faa6c;
-      --series-7:       #9c8ad1;
-      --series-8:       #d3776a;
-    }
-  }
-  :root[data-theme="dark"] .page-shell {
-    color-scheme: dark;
-    --page:           #0e1116;
-    --surface-1:      #171b22;
-    --surface-2:      #1d222b;
-    --text-primary:   #f3f5f8;
-    --text-secondary: #c3c9d4;
-    --text-muted:     #8890a0;
-    --grid:           #2a2f3a;
-    --axis:           #3a4150;
-    --border:         rgba(255,255,255,0.10);
-    --series-rating:  #4c9bdb;
-    --series-rating-fill: rgba(76,155,219,0.18);
-    --series-rank:    #e2954c;
-    --series-rank-fill: rgba(226,149,76,0.18);
-    --up-red:         #e2696a;
-    --down-blue:      #6c9bde;
-    --chip-up-bg:     rgba(226,105,106,0.15);
-    --chip-down-bg:   rgba(108,155,222,0.15);
-    --series-3:       #3fb39e;
-    --series-3-fill:  rgba(63,179,158,0.18);
-    --series-4:       #d3ab4c;
-    --series-5:       #c97ba0;
-    --series-6:       #7faa6c;
-    --series-7:       #9c8ad1;
-    --series-8:       #d3776a;
-  }
+  /* BMW M motorsport tone: near-black canvas, single visual world (no light variant — the brand itself has none) */
+  .page-shell,
+  :root:where(:not([data-theme="light"])) .page-shell,
+  :root[data-theme="dark"] .page-shell,
   :root[data-theme="light"] .page-shell {
-    color-scheme: light;
-    --page:           #f2f4f8;
-    --surface-1:      #ffffff;
-    --surface-2:      #f7f8fb;
-    --text-primary:   #171a21;
-    --text-secondary: #4a5160;
-    --text-muted:     #868fa0;
-    --grid:           #e3e7ee;
-    --axis:           #c7ccd8;
-    --border:         rgba(23,26,33,0.09);
-    --series-rating:  #1d6fa5;
-    --series-rating-fill: rgba(29,111,165,0.12);
-    --series-rank:    #c1721e;
-    --series-rank-fill: rgba(193,114,30,0.12);
-    --up-red:         #bf3b3b;
-    --down-blue:      #2e5c99;
-    --chip-up-bg:     rgba(191,59,59,0.10);
-    --chip-down-bg:   rgba(46,92,153,0.10);
-    --series-3:       #1f8f7f;
-    --series-3-fill:  rgba(31,143,127,0.12);
-    --series-4:       #a98426;
-    --series-5:       #a14d74;
-    --series-6:       #4b7a3e;
-    --series-7:       #6c5b9e;
-    --series-8:       #b14a3b;
+    color-scheme: dark;
+    --page:              #000000;
+    --surface-1:         #1a1a1a;
+    --surface-2:         #0d0d0d;
+    --surface-elevated:  #262626;
+    --text-primary:      #ffffff;
+    --text-secondary:    #bbbbbb;
+    --text-muted:        #7e7e7e;
+    --grid:              #262626;
+    --axis:              #3c3c3c;
+    --border:            #3c3c3c;
+    --m-blue-light:      #0066b1;
+    --m-blue-dark:       #1c69d4;
+    --m-red:             #e22718;
+    --series-rating:     #1c69d4;
+    --series-rating-fill: rgba(28,105,212,0.18);
+    --series-rank:       #f4b400;
+    --series-rank-fill:  rgba(244,180,0,0.16);
+    --up-red:            #e22718;
+    --down-blue:         #0066b1;
+    --chip-up-bg:        rgba(226,39,24,0.14);
+    --chip-down-bg:      rgba(0,102,177,0.16);
+    --success:           #0fa336;
+    --warning:           #f4b400;
+    --series-3:          #1f8f7f;
+    --series-3-fill:     rgba(31,143,127,0.18);
+    --series-4:          #d3ab4c;
+    --series-5:          #c97ba0;
+    --series-6:          #7faa6c;
+    --series-7:          #9c8ad1;
+    --series-8:          #d3776a;
   }
 
   * { box-sizing: border-box; }
   .viz-root {
-    font-family: system-ui, -apple-system, "Segoe UI", "Malgun Gothic", sans-serif;
+    font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", "Malgun Gothic", Roboto, sans-serif;
+    font-weight: 300;
     background: var(--page);
     color: var(--text-primary);
-    padding: 40px 32px 56px;
+    padding: 48px 32px 64px;
     max-width: 1080px;
     margin: 0 auto;
     min-width: 0;
     flex: 1 1 auto;
   }
+  .m-stripe {
+    height: 4px;
+    width: 96px;
+    margin: 14px 0 22px;
+    background: linear-gradient(90deg, var(--m-blue-light) 0%, var(--m-blue-light) 33%, var(--m-blue-dark) 33%, var(--m-blue-dark) 66%, var(--m-red) 66%, var(--m-red) 100%);
+  }
   .eyebrow {
     font-size: 12px;
-    letter-spacing: 0.08em;
+    letter-spacing: 1.5px;
     text-transform: uppercase;
     color: var(--text-muted);
-    font-weight: 600;
+    font-weight: 700;
   }
   h1 {
-    font-size: 27px;
-    line-height: 1.25;
-    margin: 6px 0 4px;
+    font-size: 40px;
+    font-weight: 700;
+    text-transform: uppercase;
+    line-height: 1.1;
+    margin: 10px 0 0;
     text-wrap: balance;
-    letter-spacing: -0.01em;
+    letter-spacing: 0;
   }
   .subtitle {
     color: var(--text-secondary);
-    font-size: 14px;
-    margin: 0 0 28px;
+    font-weight: 300;
+    font-size: 15px;
+    margin: 0 0 32px;
   }
+  .subtitle b { color: var(--text-primary); font-weight: 700; }
   .kpi-row {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
-    gap: 12px;
-    margin-bottom: 32px;
+    gap: 1px;
+    margin-bottom: 40px;
+    background: var(--border);
+    border: 1px solid var(--border);
   }
   .kpi {
     background: var(--surface-1);
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    padding: 16px 18px;
+    border-radius: 0;
+    padding: 20px 20px;
   }
   .kpi-label {
-    font-size: 11.5px;
+    font-size: 11px;
+    letter-spacing: 0.6px;
+    text-transform: uppercase;
     color: var(--text-muted);
-    margin-bottom: 8px;
+    font-weight: 700;
+    margin-bottom: 10px;
   }
   .kpi-value {
-    font-size: 22px;
-    font-weight: 650;
+    font-size: 26px;
+    font-weight: 700;
     font-variant-numeric: tabular-nums;
-    letter-spacing: -0.01em;
+    letter-spacing: 0;
   }
   .kpi-sub {
     font-size: 12px;
+    font-weight: 300;
     color: var(--text-secondary);
-    margin-top: 4px;
+    margin-top: 6px;
   }
   .chip {
     display: inline-flex;
@@ -182,79 +125,85 @@
     font-size: 12px;
     font-weight: 700;
     padding: 2px 7px;
-    border-radius: 100px;
+    border-radius: 0;
     font-variant-numeric: tabular-nums;
   }
   .chip.up   { color: var(--up-red);   background: var(--chip-up-bg); }
   .chip.down { color: var(--down-blue); background: var(--chip-down-bg); }
 
-  section { margin-bottom: 30px; }
+  section { margin-bottom: 44px; }
   h2 {
-    font-size: 15px;
-    font-weight: 650;
-    margin: 0 0 14px;
+    font-size: 18px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+    margin: 0 0 18px;
     color: var(--text-primary);
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--border);
   }
   .charts-row {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 16px;
+    gap: 1px;
+    background: var(--border);
+    border: 1px solid var(--border);
   }
   .chart-card {
     background: var(--surface-1);
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    padding: 18px 18px 8px;
+    border: none;
+    border-radius: 0;
+    padding: 20px 20px 10px;
   }
-  .chart-title { font-size: 13px; font-weight: 600; color: var(--text-secondary); margin-bottom: 2px; }
-  .chart-note { font-size: 11.5px; color: var(--text-muted); margin-bottom: 8px; }
+  .chart-title { font-size: 12px; font-weight: 700; letter-spacing: 0.4px; text-transform: uppercase; color: var(--text-secondary); margin-bottom: 4px; }
+  .chart-note { font-size: 11.5px; font-weight: 300; color: var(--text-muted); margin-bottom: 8px; }
   svg.trend { width: 100%; height: 200px; overflow: visible; }
   .gridline { stroke: var(--grid); stroke-width: 1; }
   .axisline { stroke: var(--axis); stroke-width: 1; }
   .cat-label { fill: var(--text-muted); font-size: 11px; }
-  .value-label { fill: var(--text-primary); font-size: 11.5px; font-weight: 600; font-variant-numeric: tabular-nums; }
+  .value-label { fill: var(--text-primary); font-size: 11.5px; font-weight: 700; font-variant-numeric: tabular-nums; }
   .dot { stroke: var(--surface-1); stroke-width: 2; }
   .hoverline { stroke: var(--text-muted); stroke-width: 1; stroke-dasharray: 3 3; opacity: 0; }
   .tooltip {
     position: absolute;
     pointer-events: none;
-    background: var(--surface-2);
-    border: 1.5px solid var(--border);
-    border-radius: 11px;
+    background: var(--surface-elevated);
+    border: 1px solid var(--border);
+    border-radius: 0;
     padding: 10px 14px;
     font-size: 16px;
-    box-shadow: 0 6px 22px rgba(0,0,0,0.14);
+    box-shadow: 0 8px 24px rgba(0,0,0,0.5);
     opacity: 0;
     transition: opacity 0.1s;
     white-space: nowrap;
     z-index: 5;
   }
   .tooltip .t-week { color: var(--text-muted); font-size: 14.5px; margin-bottom: 3px; }
-  .tooltip .t-val { font-weight: 650; font-variant-numeric: tabular-nums; }
+  .tooltip .t-val { font-weight: 700; font-variant-numeric: tabular-nums; }
   .tooltip .t-row { display: flex; align-items: center; gap: 7px; }
   .tooltip .t-dot { width: 10px; height: 10px; border-radius: 50%; flex: none; }
 
   .legend { display: flex; gap: 16px; margin-top: 10px; flex-wrap: wrap; }
-  .legend-item { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--text-secondary); }
+  .legend-item { display: flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 300; color: var(--text-secondary); }
   .legend-dot { width: 9px; height: 9px; border-radius: 50%; flex: none; }
 
   .stackbar-wrap { display: flex; flex-direction: column; gap: 16px; padding: 10px 4px 4px; position: relative; }
   .stackbar-row { display: flex; align-items: center; gap: 12px; }
-  .stackbar-caption { width: 62px; flex: none; font-size: 12.5px; color: var(--text-secondary); font-weight: 600; text-align: right; }
+  .stackbar-caption { width: 62px; flex: none; font-size: 12.5px; color: var(--text-secondary); font-weight: 700; text-align: right; }
 
-  .goal-row { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-bottom: 16px; }
-  .goal-card { background: var(--surface-1); border: 1px solid var(--border); border-radius: 10px; padding: 16px 18px; }
+  .goal-row { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1px; margin-bottom: 16px; background: var(--border); border: 1px solid var(--border); }
+  .goal-card { background: var(--surface-1); border: none; border-radius: 0; padding: 20px 20px; }
   .goal-head { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 10px; gap: 8px; }
-  .goal-title { font-size: 12.5px; font-weight: 650; color: var(--text-primary); }
-  .goal-nums { font-size: 12px; color: var(--text-secondary); font-variant-numeric: tabular-nums; }
-  .goal-track { position: relative; height: 14px; background: var(--grid); border-radius: 7px; margin: 4px 0 22px; }
-  .goal-fill { position: absolute; top: 0; left: 0; height: 100%; border-radius: 7px; }
+  .goal-title { font-size: 12px; font-weight: 700; letter-spacing: 0.4px; text-transform: uppercase; color: var(--text-primary); }
+  .goal-nums { font-size: 12px; font-weight: 300; color: var(--text-secondary); font-variant-numeric: tabular-nums; }
+  .goal-track { position: relative; height: 14px; background: var(--grid); border-radius: 0; margin: 4px 0 22px; }
+  .goal-fill { position: absolute; top: 0; left: 0; height: 100%; border-radius: 0; }
   .goal-target { position: absolute; top: -4px; bottom: -4px; width: 2px; background: var(--text-primary); opacity: 0.55; }
   .goal-target-label { position: absolute; top: 18px; font-size: 10.5px; color: var(--text-muted); transform: translateX(-50%); white-space: nowrap; }
-  .goal-badge { display: inline-flex; align-items: center; gap: 4px; font-size: 12px; font-weight: 700; padding: 3px 9px; border-radius: 100px; }
-  .goal-badge.good { color: #0ca30c; background: rgba(12,163,12,0.12); }
+  .goal-badge { display: inline-flex; align-items: center; gap: 4px; font-size: 12px; font-weight: 700; padding: 3px 9px; border-radius: 0; }
+  .goal-badge.good { color: var(--success); background: rgba(15,163,54,0.14); }
   .goal-badge.bad { color: var(--up-red); background: var(--chip-up-bg); }
-  .stackbar { flex: 1; height: 34px; border-radius: 6px; overflow: hidden; display: flex; flex-direction: row; box-shadow: 0 0 0 1px var(--border) inset; }
+  .stackbar { flex: 1; height: 34px; border-radius: 0; overflow: hidden; display: flex; flex-direction: row; box-shadow: 0 0 0 1px var(--border) inset; }
   .stackbar-seg { height: 100%; }
 
   table {
@@ -263,12 +212,12 @@
     font-size: 13.5px;
     background: var(--surface-1);
     border: 1px solid var(--border);
-    border-radius: 10px;
+    border-radius: 0;
     overflow: hidden;
   }
-  .table-wrap { overflow-x: auto; border-radius: 10px; }
+  .table-wrap { overflow-x: auto; border-radius: 0; }
   th, td {
-    padding: 10px 14px;
+    padding: 12px 14px;
     text-align: right;
     border-bottom: 1px solid var(--border);
     font-variant-numeric: tabular-nums;
@@ -277,11 +226,11 @@
   th:first-child, td:first-child, th:nth-child(2), td:nth-child(2) { text-align: left; }
   .share-table th:nth-child(2), .share-table td:nth-child(2) { text-align: right; }
   th {
-    font-size: 11.5px;
+    font-size: 11px;
     text-transform: uppercase;
-    letter-spacing: 0.03em;
+    letter-spacing: 1px;
     color: var(--text-muted);
-    font-weight: 600;
+    font-weight: 700;
     background: var(--surface-2);
   }
   tbody tr:last-child td { border-bottom: none; }
@@ -292,18 +241,20 @@
   .dash { color: var(--text-muted); }
 
   .method {
-    background: var(--surface-1);
+    background: var(--surface-2);
     border: 1px solid var(--border);
-    border-radius: 10px;
-    padding: 14px 18px;
+    border-radius: 0;
+    padding: 16px 20px;
     font-size: 12.5px;
+    font-weight: 300;
     color: var(--text-secondary);
     line-height: 1.7;
   }
-  .method b { color: var(--text-primary); }
+  .method b { color: var(--text-primary); font-weight: 700; }
 
   .footnote {
     font-size: 12px;
+    font-weight: 300;
     color: var(--text-muted);
     line-height: 1.6;
     border-top: 1px solid var(--border);
@@ -323,32 +274,33 @@
     top: 20px;
     flex: 0 0 200px;
     width: 200px;
-    margin: 40px 0 0;
+    margin: 48px 0 0;
     padding-bottom: 40px;
     font-size: 15.6px;
+    font-weight: 300;
   }
   .toc-label {
-    font-size: 13.2px;
-    letter-spacing: 0.08em;
+    font-size: 12px;
+    letter-spacing: 1.5px;
     text-transform: uppercase;
     color: var(--text-muted);
-    font-weight: 600;
-    padding: 0 14px 10px;
+    font-weight: 700;
+    padding: 0 14px 12px;
   }
   .toc-nav a {
     display: block;
-    padding: 7px 14px;
-    color: var(--text-secondary);
+    padding: 8px 14px;
+    color: var(--text-muted);
     text-decoration: none;
     border-left: 2px solid transparent;
     line-height: 1.4;
   }
-  .toc-nav a:hover { color: var(--text-primary); }
+  .toc-nav a:hover { color: var(--text-secondary); }
   .toc-nav a.active {
     color: var(--text-primary);
-    border-left-color: var(--series-rating);
-    background: var(--surface-1);
-    font-weight: 600;
+    border-left-color: var(--text-primary);
+    background: none;
+    font-weight: 700;
   }
   section { scroll-margin-top: 20px; }
   @media (max-width: 980px) {
@@ -384,6 +336,7 @@
 <div class="viz-root">
   <div class="eyebrow">Tcast 일일 보고서 · 광고타겟 순위 시트 · 13개지역/가구 TV Rating Ranking</div>
   <h1>MX 편성나침반</h1>
+  <div class="m-stripe"></div>
   <p class="subtitle"><b>MX 주간 시청률 실적 분석</b> · 7월 1주차(폴더 기준 06/29~07/05) ~ 8월2주차(진행중, 08/10~08/12, 3일치)</p>
 
   <div class="kpi-row" id="kpi-row"></div>
