@@ -217,20 +217,20 @@
     position: absolute;
     pointer-events: none;
     background: var(--surface-2);
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    padding: 7px 10px;
-    font-size: 11.5px;
-    box-shadow: 0 4px 16px rgba(0,0,0,0.14);
+    border: 2px solid var(--border);
+    border-radius: 16px;
+    padding: 14px 20px;
+    font-size: 23px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.14);
     opacity: 0;
     transition: opacity 0.1s;
     white-space: nowrap;
     z-index: 5;
   }
-  .tooltip .t-week { color: var(--text-muted); font-size: 10.5px; margin-bottom: 2px; }
+  .tooltip .t-week { color: var(--text-muted); font-size: 21px; margin-bottom: 4px; }
   .tooltip .t-val { font-weight: 650; font-variant-numeric: tabular-nums; }
-  .tooltip .t-row { display: flex; align-items: center; gap: 5px; }
-  .tooltip .t-dot { width: 7px; height: 7px; border-radius: 50%; flex: none; }
+  .tooltip .t-row { display: flex; align-items: center; gap: 10px; }
+  .tooltip .t-dot { width: 14px; height: 14px; border-radius: 50%; flex: none; }
 
   .legend { display: flex; gap: 16px; margin-top: 10px; flex-wrap: wrap; }
   .legend-item { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--text-secondary); }
@@ -309,17 +309,76 @@
     margin-top: 8px;
   }
 
+  html { scroll-behavior: smooth; }
+  .page-shell {
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    background: var(--page);
+  }
+  .toc-nav {
+    position: sticky;
+    top: 20px;
+    flex: 0 0 200px;
+    width: 200px;
+    margin: 40px 0 0;
+    padding-bottom: 40px;
+    font-size: 13px;
+  }
+  .toc-label {
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    font-weight: 600;
+    padding: 0 14px 10px;
+  }
+  .toc-nav a {
+    display: block;
+    padding: 7px 14px;
+    color: var(--text-secondary);
+    text-decoration: none;
+    border-left: 2px solid transparent;
+    line-height: 1.4;
+  }
+  .toc-nav a:hover { color: var(--text-primary); }
+  .toc-nav a.active {
+    color: var(--text-primary);
+    border-left-color: var(--series-rating);
+    background: var(--surface-1);
+    font-weight: 600;
+  }
+  section { scroll-margin-top: 20px; }
+  @media (max-width: 980px) {
+    .toc-nav { display: none; }
+  }
+
   @media print {
     @page { size: A4 landscape; margin: 10mm; }
     * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; color-adjust: exact !important; }
     .viz-root { max-width: none; }
     .tooltip { display: none !important; }
     section { break-inside: avoid; page-break-inside: avoid; }
+    .toc-nav { display: none !important; }
+    .page-shell { display: block !important; }
   }
 </style>
 </head>
 <body>
 
+<div class="page-shell">
+<nav class="toc-nav" id="toc-nav">
+  <div class="toc-label">목차</div>
+  <a href="#sec-snapshot">8월2주차 스냅샷</a>
+  <a href="#sec-trend">주차별 추이</a>
+  <a href="#sec-summary">주간 요약표</a>
+  <a href="#sec-franchise">주요 프로그램 추이</a>
+  <a href="#sec-topn">상위 채널 시청률 합계</a>
+  <a href="#sec-share">경쟁채널 점유율</a>
+  <a href="#sec-ufc">UFC 프로그램 경쟁력</a>
+  <a href="#sec-method">산출 방식</a>
+  <a href="#sec-schedule">편성비 — 8월 현황</a>
+</nav>
 <div class="viz-root">
   <div class="eyebrow">Tcast 일일 보고서 · 광고타겟 순위 시트 · 13개지역/가구 TV Rating Ranking</div>
   <h1>MX 편성나침반</h1>
@@ -327,7 +386,7 @@
 
   <div class="kpi-row" id="kpi-row"></div>
 
-  <section>
+  <section id="sec-snapshot">
     <h2>8월2주차 스냅샷 (진행중 · 월~수 3일)</h2>
     <div class="method">
       · 8월2주차는 아직 <b>월~수 3일(평일만)</b> 데이터입니다. 이번엔 직전 완전한 주가 8월1주차(이번 갱신으로 7일 전체 완성)이므로, 8월1주차의 <b>같은 월~수 3일로 매칭</b>해 비교했습니다.<br>
@@ -339,7 +398,7 @@
     </div>
   </section>
 
-  <section>
+  <section id="sec-trend">
     <h2>주차별 추이</h2>
     <div class="charts-row">
       <div class="chart-card">
@@ -355,7 +414,7 @@
     </div>
   </section>
 
-  <section>
+  <section id="sec-summary">
     <h2>주간 요약표 — 전주대비 증감</h2>
     <div class="table-wrap">
       <table>
@@ -375,7 +434,7 @@
     </div>
   </section>
 
-  <section>
+  <section id="sec-franchise">
     <h2>주요 프로그램 시청률 추이: UFC · 용감한형사들 · 나는자연인이다</h2>
     <div class="chart-card">
       <div class="chart-title">MX 채널 주요 프로그램 주간 평균시청률 추이 (7월 1~5주차)</div>
@@ -407,7 +466,7 @@
     <div class="chart-card" id="anomaly-card" style="margin-top:16px;"></div>
   </section>
 
-  <section>
+  <section id="sec-topn">
     <h2>상위 채널 시청률 합계 추이 (시장 규모 지표)</h2>
     <div class="chart-card">
       <div class="chart-title">상위 200 / 100 / 30개 채널 시청률 합, 주간평균</div>
@@ -434,7 +493,7 @@
     </div>
   </section>
 
-  <section>
+  <section id="sec-share">
     <h2>MX 경쟁채널 점유율 (MX + 스포츠채널 7개 = 100%)</h2>
     <div class="chart-card">
       <div class="chart-title">주간 시청률 점유율 구성비</div>
@@ -462,7 +521,7 @@
     </div>
   </section>
 
-  <section>
+  <section id="sec-ufc">
     <h2>UFC 프로그램 경쟁력: MX vs tvN SPORTS</h2>
     <div class="chart-card">
       <div class="chart-title">주간 UFC 전체평균시청률 추이</div>
@@ -504,7 +563,7 @@
     </div>
   </section>
 
-  <section>
+  <section id="sec-method">
     <h2>산출 방식</h2>
     <div class="method">
       · <b>주차 구분</b>: 파일명(날짜)이 아니라 폴더명 기준. 「7월1주차」 폴더는 06/29~07/05, 「7월5주차」 폴더는 07/27~08/02처럼 월 경계를 넘어가도 폴더명이 그 주차입니다.<br>
@@ -520,7 +579,7 @@
     </div>
   </section>
 
-  <section>
+  <section id="sec-schedule">
     <h2>플랫폼 평가용 프로그램 편성비 — 8월 현황 (7월 대비)</h2>
     <div class="kpi-row" id="augcmp-kpi-row" style="grid-template-columns: repeat(2, 1fr);"></div>
     <div class="chart-card">
@@ -553,6 +612,7 @@
     ※ 데이터 출처: 끌로드 실습 폴더 내 「7월1주차~5주차, 8월1주차, 8월2주차(진행중)」의 Tcast일일 보고서(.xls) — 동일 계산 결과가 <b>MX_주간 평균시청률 및 순위분석.xlsx</b>(일별데이터·주간요약 시트, 전주대비 증감률(%) 조건부 서식 및 주간추이_그래프 시트)에 반영되어 있습니다.<br>
     ※ 순위는 낮을수록(1위에 가까울수록) 상위권입니다. 시청률 증감률의 색상(▲빨강=상승 / ▼파랑=하락)은 수치 자체의 방향이며, 순위 증감은 <b>전주대비 몇 계단 오르내렸는지(이전 순위 − 이번 순위)</b>로 표기하여 ▲빨강=순위 상승(개선) / ▼파랑=순위 하락(악화)을 의미합니다. 예) 104위→87위는 <b>+17</b>(빨강).
   </div>
+</div>
 </div>
 
 <script>
@@ -1157,6 +1217,25 @@
     clearTimeout(resizeTimer);
     resizeTimer = setTimeout(rerenderAllCharts, 150);
   });
+
+  // ---- table of contents: active-link highlight on scroll ----
+  var tocLinks = Array.prototype.slice.call(document.querySelectorAll(".toc-nav a"));
+  var tocSections = tocLinks.map(function (a) { return document.querySelector(a.getAttribute("href")); }).filter(Boolean);
+  if (tocLinks.length && tocSections.length && "IntersectionObserver" in window) {
+    var setActive = function (id) {
+      tocLinks.forEach(function (a) {
+        a.classList.toggle("active", a.getAttribute("href") === "#" + id);
+      });
+    };
+    var observer = new IntersectionObserver(function (entries) {
+      var visible = entries.filter(function (e) { return e.isIntersecting; });
+      if (visible.length) {
+        visible.sort(function (a, b) { return a.boundingClientRect.top - b.boundingClientRect.top; });
+        setActive(visible[0].target.id);
+      }
+    }, { rootMargin: "-15% 0px -70% 0px", threshold: 0 });
+    tocSections.forEach(function (s) { observer.observe(s); });
+  }
 })();
 </script>
 </body>
