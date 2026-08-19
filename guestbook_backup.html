@@ -1,0 +1,137 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>내 웹페이지</title>
+<style>
+  :root{ --bg:#f6f7f9; --card:#fff; --ink:#1b2030; --muted:#5b6472; --line:#e6e8ee; --accent:#3f5bd9; }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);
+       font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Malgun Gothic",sans-serif;line-height:1.7}
+  .wrap{max-width:640px;margin:0 auto;padding:56px 20px 80px}
+  h1{font-size:34px;margin:0 0 8px}
+  .sub{color:var(--muted);margin:0 0 32px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:22px 24px;margin:0 0 20px}
+  h2{font-size:18px;margin:0 0 14px}
+  label{display:block;font-size:14px;color:var(--muted);margin:12px 0 6px}
+  input,textarea{width:100%;padding:11px 13px;border:1px solid var(--line);border-radius:9px;
+                 font:inherit;background:#fff;color:var(--ink)}
+  textarea{min-height:88px;resize:vertical}
+  button{margin-top:16px;width:100%;padding:12px;border:0;border-radius:9px;background:var(--accent);
+         color:#fff;font:inherit;font-weight:700;cursor:pointer}
+  button:disabled{opacity:.5;cursor:default}
+  .msg{margin-top:12px;font-size:14px;color:var(--muted);min-height:20px}
+  .entry{border-top:1px solid var(--line);padding:14px 0}
+  .entry:first-child{border-top:0}
+  .entry b{display:block}
+  .entry time{font-size:12.5px;color:var(--muted)}
+  .notice{background:#fef4ec;border:1px solid #e2a06a;border-radius:10px;padding:14px 16px;font-size:14.5px}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <h1>안녕하세요, 강동민입니다</h1>
+  <p class="sub">이 페이지는 GitHub에 올려 Vercel로 배포했습니다.</p>
+
+  <section class="card">
+    <h2>방명록 남기기</h2>
+    <form id="guestbook-form">
+      <label for="name">이름</label>
+      <input id="name" maxlength="20" required placeholder="이름을 적어 주세요">
+      <label for="message">한마디</label>
+      <textarea id="message" maxlength="200" required placeholder="하고 싶은 말을 적어 주세요"></textarea>
+      <button type="submit" id="submit-btn">남기기</button>
+    </form>
+    <p class="msg" id="form-msg"></p>
+  </section>
+
+  <section class="card">
+    <h2>남겨진 글</h2>
+    <div id="entries"><p class="msg">불러오는 중...</p></div>
+  </section>
+
+</div>
+
+<!-- Supabase 라이브러리 -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+  // 여기 두 줄만 내 값으로 바꿉니다 (가이드 6단계)
+  const SUPABASE_URL = "";
+  const SUPABASE_KEY = "";
+
+  const entriesEl = document.getElementById("entries");
+  const formEl = document.getElementById("guestbook-form");
+  const msgEl = document.getElementById("form-msg");
+  const btnEl = document.getElementById("submit-btn");
+
+  const connected = SUPABASE_URL !== "" && SUPABASE_KEY !== "";
+  const db = connected ? supabase.createClient(SUPABASE_URL, SUPABASE_KEY) : null;
+
+  if (!connected) {
+    entriesEl.innerHTML =
+      '<div class="notice">아직 데이터베이스를 연결하지 않았습니다. ' +
+      "가이드의 데이터베이스 단계를 마치고 index.html 위쪽 두 줄을 채우면 " +
+      "여기에 방명록이 쌓입니다.</div>";
+    btnEl.disabled = true;
+  } else {
+    loadEntries();
+  }
+
+  async function loadEntries() {
+    const { data, error } = await db
+      .from("guestbook")
+      .select("*")
+      .order("created_at", { ascending: false })
+      .limit(50);
+
+    if (error) {
+      entriesEl.innerHTML = '<p class="msg">불러오지 못했습니다: ' + error.message + "</p>";
+      return;
+    }
+    if (!data.length) {
+      entriesEl.innerHTML = '<p class="msg">아직 남겨진 글이 없습니다.</p>';
+      return;
+    }
+    entriesEl.innerHTML = data
+      .map(function (row) {
+        return (
+          '<div class="entry"><b>' +
+          escapeHtml(row.name) +
+          "</b>" +
+          escapeHtml(row.message) +
+          "<time>" +
+          new Date(row.created_at).toLocaleString("ko-KR") +
+          "</time></div>"
+        );
+      })
+      .join("");
+  }
+
+  formEl.addEventListener("submit", async function (event) {
+    event.preventDefault();
+    btnEl.disabled = true;
+    msgEl.textContent = "저장하는 중...";
+
+    const { error } = await db.from("guestbook").insert({
+      name: document.getElementById("name").value.trim(),
+      message: document.getElementById("message").value.trim(),
+    });
+
+    if (error) {
+      msgEl.textContent = "저장하지 못했습니다: " + error.message;
+    } else {
+      msgEl.textContent = "남겼습니다.";
+      formEl.reset();
+      loadEntries();
+    }
+    btnEl.disabled = false;
+  });
+
+  function escapeHtml(text) {
+    return String(text).replace(/[&<>"']/g, function (ch) {
+      return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[ch];
+    });
+  }
+</script>
