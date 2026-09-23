@@ -55,31 +55,22 @@ h1{color:#ffffff}
 
 <script>
 
-let selectedSessionDate=null,lastChartClick={time:0,date:null};
-function selectSessionDate(date){
-  selectedSessionDate=date;
-  document.querySelectorAll("#tbl tr").forEach(tr=>tr.classList.toggle("selected-row",tr.dataset.date===date));
-  const row=document.querySelector('#tbl tr[data-date="'+date+'"]');
-  if(row) row.scrollIntoView({behavior:"smooth",block:"center"});
-}
-function handleChartClick(rows){
-  return function(event,active,chart){
-    if(!active || !active.length){
-      chart.tooltip.setActiveElements([]);
-      chart.update();
-      lastChartClick={time:0,date:null};
-      return;
-    }
-    const idx=active[0].index, row=rows[idx];
-    if(!row) return;
+let lastPointClick={time:0,date:null};
+function chartClickHandler(rows){
+  return function(event, elements){
+    if(!elements || !elements.length) return;
+    const row=rows[elements[0].index];
+    if(!row || !row.date) return;
     const now=Date.now();
-    if(lastChartClick.date===row.date && now-lastChartClick.time<700){
-      selectSessionDate(row.date);
-      lastChartClick={time:0,date:null};
+    if(lastPointClick.date===row.date && now-lastPointClick.time<650){
+      document.querySelectorAll("#tbl tr").forEach(tr=>{
+        tr.classList.toggle("selected-row",tr.getAttribute("data-date")===row.date);
+      });
+      const target=document.querySelector('#tbl tr[data-date="'+row.date+'"]');
+      if(target) target.scrollIntoView({behavior:"smooth",block:"center"});
+      lastPointClick={time:0,date:null};
     }else{
-      lastChartClick={time:now,date:row.date};
-      chart.tooltip.setActiveElements(active.map(a=>({datasetIndex:a.datasetIndex,index:a.index})));
-      chart.update();
+      lastPointClick={time:now,date:row.date};
     }
   };
 }
@@ -112,27 +103,27 @@ const base={responsive:true,maintainAspectRatio:false,interaction:{mode:"nearest
 
 new Chart(document.getElementById("p20"),{type:"line",data:{labels:S.map(x=>x.d),
  datasets:[lineDataset("p20","I",C.i,"실내"),lineDataset("p20","O",C.o,"실외"),regressionTrend(S,"p20",C.t)]},
- options:{...base,onClick:handleChartClick(S),scales:{...base.scales,y:{min:70,max:140,ticks:{color:"#9aa9ba",stepSize:10},grid:{color:"#202b38"}}}}});
+ options:{...base,onClick:chartClickHandler(S),scales:{...base.scales,y:{min:70,max:140,ticks:{color:"#9aa9ba",stepSize:10},grid:{color:"#202b38"}}}}});
 new Chart(document.getElementById("np"),{type:"line",data:{labels:S.map(x=>x.d),
  datasets:[lineDataset("np","I",C.i,"실내"),lineDataset("np","O",C.o,"실외"),regressionTrend(S,"np",C.t)]},
- options:{...base,onClick:handleChartClick(S),scales:{...base.scales,y:{min:75,max:135,ticks:{color:"#9aa9ba",stepSize:10},grid:{color:"#202b38"}}}}});
+ options:{...base,onClick:chartClickHandler(S),scales:{...base.scales,y:{min:75,max:135,ticks:{color:"#9aa9ba",stepSize:10},grid:{color:"#202b38"}}}}});
 
 const E=S.filter(x=>x.eff!=null&&x.env==="I"&&x.hr<=155&&x.dur>=0.75);
 const effOpt={...base,scales:{x:{ticks:{color:"#9aa9ba",maxRotation:45},grid:{color:"#202b38"}},
  y:{min:70,ticks:{color:"#9aa9ba"},grid:{color:"#202b38"}}}};
 new Chart(document.getElementById("eff"),{type:"line",data:{labels:E.map(x=>x.d),
  datasets:[{label:"Power @ HR 145–155",data:E.map(x=>x.eff),borderColor:C.i,backgroundColor:C.i,
- tension:.25,pointRadius:4,pointHoverRadius:7,borderWidth:2.8},regressionTrend(E,"eff",C.t)]},options:{...effOpt,onClick:handleChartClick(E)}});
+ tension:.25,pointRadius:4,pointHoverRadius:7,borderWidth:2.8},regressionTrend(E,"eff",C.t)]},options:{...effOpt,onClick:chartClickHandler(E)}});
 
 const Z=S.filter(x=>x.dec!=null);
 new Chart(document.getElementById("dec"),{type:"line",data:{labels:Z.map(x=>x.d),
  datasets:[{label:"Decoupling",data:Z.map(x=>x.dec),borderColor:C.i,backgroundColor:C.i,tension:.25,
- pointRadius:4,pointHoverRadius:7,borderWidth:2.8},regressionTrend(Z,"dec",C.t)]},options:{...base,onClick:handleChartClick(Z)}});
+ pointRadius:4,pointHoverRadius:7,borderWidth:2.8},regressionTrend(Z,"dec",C.t)]},options:{...base,onClick:chartClickHandler(Z)}});
 
 new Chart(document.getElementById("grade"),{type:"bar",data:{labels:D.grades.map(x=>x.grade),
  datasets:[{label:"W/kg",data:D.grades.map(x=>x.wkg),backgroundColor:C.o,borderColor:C.o,borderWidth:1,
  barPercentage:.9,categoryPercentage:.9,maxBarThickness:72}]},
- options:{...base,onClick:handleChartClick(D.grades),layout:{padding:{right:24,left:4}},scales:{...base.scales,
+ options:{...base,layout:{padding:{right:24,left:4}},scales:{...base.scales,
  x:{...base.scales.x,offset:true},
  y:{...base.scales.y,beginAtZero:false}},
  plugins:{...base.plugins,tooltip:{callbacks:{afterLabel:ctx=>{const g=D.grades[ctx.dataIndex];
