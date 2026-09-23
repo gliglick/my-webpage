@@ -11,67 +11,89 @@ main{max-width:1180px;margin:auto;padding:22px 14px 56px}h1{margin:0;font-size:2
 .legend{display:flex;gap:16px;color:#9eacbe;font-size:12px;margin-top:8px;flex-wrap:wrap}.dot{width:9px;height:9px;border-radius:50%;display:inline-block;margin-right:5px}
 .c{background:#12e7f5}.p{background:#ff2f7f}.u{background:#a855f7}
 table{width:100%;border-collapse:collapse;font-size:12px}th,td{padding:8px;border-bottom:1px solid #202a35;white-space:nowrap;text-align:right}th:first-child,td:first-child{text-align:left}th{color:#91a0b2}
-.readout p{margin:7px 0}.muted{color:#91a0b2}
+.readout p{margin:7px 0}.good{color:#19d3a2}.muted{color:#91a0b2}
 @media(max-width:760px){.grid{grid-template-columns:1fr}.chartbox{height:280px}h1{font-size:24px}}
 </style></head><body><main>
 <h1>Cycle Performance Lab</h1><div class="sub">2026.06.03–2026.09.21 · 32 FIT · 31 논리 세션 · FTP 133 W</div>
+
 <div class="grid">
-<div class="card"><h2>20분 최고 Power</h2><div class="sub">실내 CYAN · 실외 MAGENTA · 장기 추세 PURPLE</div><div class="chartbox"><canvas id="p20"></canvas></div><div class="legend"><span><i class="dot c"></i>실내</span><span><i class="dot p"></i>실외</span><span><i class="dot u"></i>장기 추세</span></div></div>
-<div class="card"><h2>Normalized Power</h2><div class="sub">Power가 기록된 세션의 NP 추세</div><div class="chartbox"><canvas id="np"></canvas></div><div class="legend"><span><i class="dot c"></i>실내</span><span><i class="dot p"></i>실외</span><span><i class="dot u"></i>장기 추세</span></div></div>
+<div class="card"><h2>20분 최고 Power</h2><div class="sub">실내 CYAN · 실외 MAGENTA · 장기 추세 PURPLE(선형회귀)</div><div class="chartbox"><canvas id="p20"></canvas></div>
+<div class="legend"><span><i class="dot c"></i>실내</span><span><i class="dot p"></i>실외</span><span><i class="dot u"></i>장기 추세</span></div></div>
+<div class="card"><h2>Normalized Power</h2><div class="sub">Power가 기록된 세션의 NP 추세</div><div class="chartbox"><canvas id="np"></canvas></div>
+<div class="legend"><span><i class="dot c"></i>실내</span><span><i class="dot p"></i>실외</span><span><i class="dot u"></i>장기 추세</span></div></div>
 </div>
+
 <div class="grid">
 <div class="card"><h2>같은 심박에서 낼 수 있는 Power</h2><div class="sub">HR 145–155 bpm · 실내 · 평균 HR ≤155 · 45분 이상</div><div class="chartbox"><canvas id="eff"></canvas></div></div>
 <div class="card"><h2>장시간 Aerobic Decoupling</h2><div class="sub">실내 Z2 유사 세션 · 0%에 가까울수록 후반 효율 저하가 작음</div><div class="chartbox"><canvas id="dec"></canvas></div></div>
 </div>
+
 <div class="grid">
 <div class="card"><h2>실외 등반 퍼포먼스</h2><div class="sub">경사별 median W/kg · 막대에 마우스/터치하면 Power·HR·표본 표시</div><div class="chartbox"><canvas id="grade"></canvas></div></div>
-<div class="card"><h2>현재 사이클 퍼포먼스 판독</h2><div class="readout"><p><b>Power:</b> 현재 최고 20분 Power는 <span id="best20"></span> W.</p><p><b>Aerobic Efficiency:</b> HR 145–155에서 <span id="firstEff"></span> W → <span id="lastEff"></span> W.</p><p><b>최근 110분 Z2:</b> <span id="z2"></span>.</p><p><b>실내↔실외 HR:</b> 80–100 W 구간 중앙값 차이 <span id="gap"></span> bpm.</p><p class="muted">실내와 실외 HR은 절대값으로 합산하지 않고 환경별 추세로 해석합니다.</p></div></div>
+<div class="card"><h2>현재 사이클 퍼포먼스 판독</h2><div class="readout">
+<p><b>Power:</b> 현재 최고 20분 Power는 <span id="best20"></span> W.</p>
+<p><b>Aerobic Efficiency:</b> HR 145–155에서 <span id="firstEff"></span> W → <span id="lastEff"></span> W.</p>
+<p><b>최근 110분 Z2:</b> <span id="z2"></span>.</p>
+<p><b>실내↔실외 HR:</b> 80–100 W 구간 중앙값 차이 <span id="gap"></span> bpm.</p>
+<p class="muted">실내와 실외 HR은 절대값으로 합산하지 않고 환경별 추세로 해석합니다.</p>
+</div></div>
 </div>
-<div class="card" style="margin-top:12px"><h2>최근 통합 세션</h2><div style="overflow:auto"><table><thead><tr><th>날짜</th><th>구분</th><th>세션</th><th>시간</th><th>거리</th><th>HR</th><th>Power</th><th>NP</th><th>P20</th><th>TSS</th></tr></thead><tbody id="tbl"></tbody></table></div></div>
+
+<div class="card" style="margin-top:12px"><h2>최근 통합 세션</h2><div style="overflow:auto"><table><thead><tr>
+<th>날짜</th><th>구분</th><th>세션</th><th>시간</th><th>거리</th><th>HR</th><th>Power</th><th>NP</th><th>P20</th><th>TSS</th>
+</tr></thead><tbody id="tbl"></tbody></table></div></div>
+
 <script>
-const D={"sessions":[{"d":"06-03","date":"2026-06-03","env":"I","title":"실내 자전거","hr":146.3,"p":83.8,"np":100,"p20":93.2,"tss":87.3,"dur":1.44,"dist":26413.8,"eff":84,"dec":-3.52},{"d":"06-08","date":"2026-06-08","env":"I","title":"실내 자전거","hr":161.3,"p":96.6,"np":103,"p20":110.3,"tss":55.8,"dur":0.87,"dist":17347.7,"eff":57,"dec":null},{"d":"06-10","date":"2026-06-10","env":"I","title":"실내 자전거","hr":145.6,"p":83.8,"np":86,"p20":88.6,"tss":48.5,"dur":1.09,"dist":20043.5,"eff":88,"dec":-0.9},{"d":"06-13","date":"2026-06-13","env":"I","title":"실내 자전거","hr":162.9,"p":96.7,"np":110,"p20":112.5,"tss":61.4,"dur":0.84,"dist":16349.4,"eff":81,"dec":null},{"d":"06-15","date":"2026-06-15","env":"I","title":"실내 자전거","hr":140.9,"p":83.5,"np":84,"p20":85.6,"tss":47.4,"dur":1.1,"dist":20231.9,"eff":87,"dec":-0.54},{"d":"06-20","date":"2026-06-20","env":"I","title":"실내 자전거","hr":163.7,"p":107.1,"np":112,"p20":113.7,"tss":69.9,"dur":0.92,"dist":19880,"eff":115,"dec":null},{"d":"06-28","date":"2026-06-28","env":"I","title":"실내 자전거","hr":168.8,"p":99.4,"np":108,"p20":110,"tss":52.9,"dur":0.76,"dist":22591.6,"eff":86,"dec":null},{"d":"06-29","date":"2026-06-29","env":"I","title":"실내 자전거","hr":143.1,"p":83.1,"np":83,"p20":85.1,"tss":71.8,"dur":1.7,"dist":50332.4,"eff":84,"dec":1.34},{"d":"07-02","date":"2026-07-02","env":"I","title":"실내 자전거","hr":168.3,"p":101.3,"np":118,"p20":115.6,"tss":54.3,"dur":0.64,"dist":22494,"eff":79,"dec":null},{"d":"07-05","date":"2026-07-05","env":"I","title":"실내 자전거","hr":144.2,"p":89,"np":89,"p20":90.7,"tss":68.1,"dur":1.4,"dist":42810.9,"eff":90,"dec":1.86},{"d":"07-08","date":"2026-07-08","env":"I","title":"실내 자전거","hr":158,"p":99.8,"np":107,"p20":108.1,"tss":75.9,"dur":1.1,"dist":32231.5,"eff":75,"dec":null},{"d":"07-12","date":"2026-07-12","env":"I","title":"실내 자전거","hr":141.8,"p":81.7,"np":111,"p20":93.8,"tss":109.4,"dur":1.47,"dist":45067.7,"eff":90,"dec":26.66},{"d":"07-25","date":"2026-07-25","env":"O","title":"한강 왕복 (2 FIT 통합)","hr":159.8,"p":null,"np":null,"p20":null,"tss":null,"dur":4.33,"dist":69540.8,"eff":null,"dec":null},{"d":"07-30","date":"2026-07-30","env":"I","title":"Zwift - Hilltop Hustle in Watopia","hr":152.2,"p":87.3,"np":94,"p20":96.5,"tss":53.7,"dur":1.01,"dist":31114.6,"eff":88,"dec":1.72},{"d":"08-02","date":"2026-08-02","env":"O","title":"Co&Gal 한강라이딩-63빌딩","hr":167.7,"p":null,"np":null,"p20":null,"tss":null,"dur":2.85,"dist":60360.2,"eff":null,"dec":null},{"d":"08-07","date":"2026-08-07","env":"I","title":"Zwift - Pacer Group Ride with Bernie","hr":147.1,"p":90.3,"np":97,"p20":96,"tss":82.4,"dur":1.43,"dist":42129.4,"eff":92,"dec":2.94},{"d":"08-09","date":"2026-08-09","env":"O","title":"한강라이딩-천호대교","hr":159.9,"p":null,"np":null,"p20":null,"tss":null,"dur":2.96,"dist":62575.2,"eff":null,"dec":null},{"d":"08-14","date":"2026-08-14","env":"I","title":"Zwift - Pacer Group Ride with Bernie","hr":151.6,"p":92.7,"np":108,"p20":110.6,"tss":48.4,"dur":0.68,"dist":20161.3,"eff":89,"dec":null},{"d":"08-16","date":"2026-08-16","env":"I","title":"Zwift - FTP Ramp Test [Lite]","hr":160.5,"p":98.1,"np":120,"p20":103.4,"tss":31.6,"dur":0.37,"dist":9606.7,"eff":74,"dec":null},{"d":"08-17","date":"2026-08-17","env":"I","title":"Zwift - Danger Noodle in Watopia","hr":146.6,"p":88.9,"np":90,"p20":92,"tss":65.6,"dur":1.34,"dist":40861,"eff":91,"dec":1.99},{"d":"08-19","date":"2026-08-19","env":"I","title":"Zwift - Pacer Group Ride with Miguel","hr":161.1,"p":110.3,"np":114,"p20":112.9,"tss":70.6,"dur":1,"dist":31279.5,"eff":108,"dec":null},{"d":"08-23","date":"2026-08-23","env":"I","title":"실내 자전거타기","hr":146.1,"p":82.6,"np":89,"p20":91.8,"tss":54.2,"dur":1.26,"dist":40660.4,"eff":84,"dec":-1.28},{"d":"09-01","date":"2026-09-01","env":"I","title":"실내 자전거타기","hr":150.3,"p":84.5,"np":85,"p20":88.5,"tss":39.8,"dur":1.01,"dist":35270.6,"eff":85,"dec":-5.96},{"d":"09-06","date":"2026-09-06","env":"O","title":"Co&Gal 두물머리 왕복 (CSV 2분할 · FIT 상세 1구간)","hr":161.1,"p":84.8,"np":101,"p20":115.6,"tss":211.7,"dur":5.12,"dist":56.9,"eff":88.5,"dec":null},{"d":"09-09","date":"2026-09-09","env":"I","title":"실내 자전거타기","hr":147.4,"p":88.3,"np":91,"p20":95.5,"tss":45.7,"dur":1.02,"dist":30848.5,"eff":93,"dec":11.52},{"d":"09-11","date":"2026-09-11","env":"O","title":"아이유 고개","hr":157.5,"p":84.5,"np":104,"p20":103.4,"tss":148.3,"dur":2.49,"dist":52548.7,"eff":94,"dec":null},{"d":"09-13","date":"2026-09-13","env":"O","title":"Co & Gal 여의도 한강공원","hr":162.5,"p":93.2,"np":111,"p20":112,"tss":151.3,"dur":2.31,"dist":52995.3,"eff":97,"dec":null},{"d":"09-15","date":"2026-09-15","env":"I","title":"실내 자전거타기","hr":159.3,"p":97.4,"np":114,"p20":113,"tss":41.8,"dur":0.6,"dist":15334.3,"eff":75,"dec":null},{"d":"09-17","date":"2026-09-17","env":"I","title":"실내 자전거타기","hr":143.7,"p":87.4,"np":95,"p20":91.5,"tss":68.7,"dur":1.4,"dist":41930.5,"eff":95,"dec":-1.04},{"d":"09-20","date":"2026-09-20","env":"I","title":"실내 자전거타기","hr":146.9,"p":96.3,"np":97,"p20":98,"tss":93.7,"dur":1.83,"dist":60206.6,"eff":97,"dec":0.11},{"d":"09-21","date":"2026-09-21","env":"I","title":"실내 자전거타기","hr":166.6,"p":108.3,"np":118,"p20":119.1,"tss":60.7,"dur":0.8,"dist":21193.5,"eff":76,"dec":null}],"grades":[{"grade":"≤ -2%","wkg":1.66,"power":96,"hr":160,"n":635},{"grade":"-2~0%","wkg":1.71,"power":99,"hr":162,"n":12755},{"grade":"0~2%","wkg":1.76,"power":102,"hr":165,"n":9810},{"grade":"2~4%","wkg":1.95,"power":113,"hr":167,"n":1315},{"grade":"4~6%","wkg":2.55,"power":148,"hr":175,"n":667},{"grade":"6~8%","wkg":2.82,"power":163.5,"hr":180,"n":60}]};
+const D={"sessions":[{"d":"06-03","date":"2026-06-03","env":"I","title":"실내 자전거","hr":146.3,"p":83.8,"np":100.0,"p20":93.2,"tss":87.3,"dur":1.44,"dist":26413.8,"eff":84.0,"dec":-3.52,"merged":false,"partial":false},{"d":"06-08","date":"2026-06-08","env":"I","title":"실내 자전거","hr":161.3,"p":96.6,"np":103.0,"p20":110.3,"tss":55.8,"dur":0.87,"dist":17347.7,"eff":57.0,"dec":null,"merged":false,"partial":false},{"d":"06-10","date":"2026-06-10","env":"I","title":"실내 자전거","hr":145.6,"p":83.8,"np":86.0,"p20":88.6,"tss":48.5,"dur":1.09,"dist":20043.5,"eff":88.0,"dec":-0.9,"merged":false,"partial":false},{"d":"06-13","date":"2026-06-13","env":"I","title":"실내 자전거","hr":162.9,"p":96.7,"np":110.0,"p20":112.5,"tss":61.4,"dur":0.84,"dist":16349.4,"eff":81.0,"dec":null,"merged":false,"partial":false},{"d":"06-15","date":"2026-06-15","env":"I","title":"실내 자전거","hr":140.9,"p":83.5,"np":84.0,"p20":85.6,"tss":47.4,"dur":1.1,"dist":20231.9,"eff":87.0,"dec":-0.54,"merged":false,"partial":false},{"d":"06-20","date":"2026-06-20","env":"I","title":"실내 자전거","hr":163.7,"p":107.1,"np":112.0,"p20":113.7,"tss":69.9,"dur":0.92,"dist":19880.0,"eff":115.0,"dec":null,"merged":false,"partial":false},{"d":"06-28","date":"2026-06-28","env":"I","title":"실내 자전거","hr":168.8,"p":99.4,"np":108.0,"p20":110.0,"tss":52.9,"dur":0.76,"dist":22591.6,"eff":86.0,"dec":null,"merged":false,"partial":false},{"d":"06-29","date":"2026-06-29","env":"I","title":"실내 자전거","hr":143.1,"p":83.1,"np":83.0,"p20":85.1,"tss":71.8,"dur":1.7,"dist":50332.4,"eff":84.0,"dec":1.34,"merged":false,"partial":false},{"d":"07-02","date":"2026-07-02","env":"I","title":"실내 자전거","hr":168.3,"p":101.3,"np":118.0,"p20":115.6,"tss":54.3,"dur":0.64,"dist":22494.0,"eff":79.0,"dec":null,"merged":false,"partial":false},{"d":"07-05","date":"2026-07-05","env":"I","title":"실내 자전거","hr":144.2,"p":89.0,"np":89.0,"p20":90.7,"tss":68.1,"dur":1.4,"dist":42810.9,"eff":90.0,"dec":1.86,"merged":false,"partial":false},{"d":"07-08","date":"2026-07-08","env":"I","title":"실내 자전거","hr":158.0,"p":99.8,"np":107.0,"p20":108.1,"tss":75.9,"dur":1.1,"dist":32231.5,"eff":75.0,"dec":null,"merged":false,"partial":false},{"d":"07-12","date":"2026-07-12","env":"I","title":"실내 자전거","hr":141.8,"p":81.7,"np":111.0,"p20":93.8,"tss":109.4,"dur":1.47,"dist":45067.7,"eff":90.0,"dec":26.66,"merged":false,"partial":false},{"d":"07-25","date":"2026-07-25","env":"O","title":"한강 왕복 (2 FIT 통합)","hr":159.8,"p":null,"np":null,"p20":null,"tss":null,"dur":4.33,"dist":69540.8,"eff":null,"dec":null,"merged":true,"partial":false},{"d":"07-30","date":"2026-07-30","env":"I","title":"Zwift - Hilltop Hustle in Watopia","hr":152.2,"p":87.3,"np":94.0,"p20":96.5,"tss":53.7,"dur":1.01,"dist":31114.6,"eff":88.0,"dec":1.72,"merged":false,"partial":false},{"d":"08-02","date":"2026-08-02","env":"O","title":"Co&Gal 한강라이딩-63빌딩","hr":167.7,"p":null,"np":null,"p20":null,"tss":null,"dur":2.85,"dist":60360.2,"eff":null,"dec":null,"merged":false,"partial":false},{"d":"08-07","date":"2026-08-07","env":"I","title":"Zwift - Pacer Group Ride with Bernie","hr":147.1,"p":90.3,"np":97.0,"p20":96.0,"tss":82.4,"dur":1.43,"dist":42129.4,"eff":92.0,"dec":2.94,"merged":false,"partial":false},{"d":"08-09","date":"2026-08-09","env":"O","title":"한강라이딩-천호대교","hr":159.9,"p":null,"np":null,"p20":null,"tss":null,"dur":2.96,"dist":62575.2,"eff":null,"dec":null,"merged":false,"partial":false},{"d":"08-14","date":"2026-08-14","env":"I","title":"Zwift - Pacer Group Ride with Bernie","hr":151.6,"p":92.7,"np":108.0,"p20":110.6,"tss":48.4,"dur":0.68,"dist":20161.3,"eff":89.0,"dec":null,"merged":false,"partial":false},{"d":"08-16","date":"2026-08-16","env":"I","title":"Zwift - FTP Ramp Test [Lite]","hr":160.5,"p":98.1,"np":120.0,"p20":103.4,"tss":31.6,"dur":0.37,"dist":9606.7,"eff":74.0,"dec":null,"merged":false,"partial":false},{"d":"08-17","date":"2026-08-17","env":"I","title":"Zwift - Danger Noodle in Watopia","hr":146.6,"p":88.9,"np":90.0,"p20":92.0,"tss":65.6,"dur":1.34,"dist":40861.0,"eff":91.0,"dec":1.99,"merged":false,"partial":false},{"d":"08-19","date":"2026-08-19","env":"I","title":"Zwift - Pacer Group Ride with Miguel","hr":161.1,"p":110.3,"np":114.0,"p20":112.9,"tss":70.6,"dur":1.0,"dist":31279.5,"eff":108.0,"dec":null,"merged":false,"partial":false},{"d":"08-23","date":"2026-08-23","env":"I","title":"실내 자전거타기","hr":146.1,"p":82.6,"np":89.0,"p20":91.8,"tss":54.2,"dur":1.26,"dist":40660.4,"eff":84.0,"dec":-1.28,"merged":false,"partial":false},{"d":"09-01","date":"2026-09-01","env":"I","title":"실내 자전거타기","hr":150.3,"p":84.5,"np":85.0,"p20":88.5,"tss":39.8,"dur":1.01,"dist":35270.6,"eff":85.0,"dec":-5.96,"merged":false,"partial":false},{"d":"09-06","date":"2026-09-06","env":"O","title":"Co&Gal 두물머리 왕복 (CSV 2분할 · FIT 상세 1구간)","hr":161.1,"p":84.8,"np":101.0,"p20":115.6,"tss":211.7,"dur":5.12,"dist":56.9,"eff":88.5,"dec":null,"merged":false,"partial":true},{"d":"09-09","date":"2026-09-09","env":"I","title":"실내 자전거타기","hr":147.4,"p":88.3,"np":91.0,"p20":95.5,"tss":45.7,"dur":1.02,"dist":30848.5,"eff":93.0,"dec":11.52,"merged":false,"partial":false},{"d":"09-11","date":"2026-09-11","env":"O","title":"아이유 고개","hr":157.5,"p":84.5,"np":104.0,"p20":103.4,"tss":148.3,"dur":2.49,"dist":52548.7,"eff":94.0,"dec":null,"merged":false,"partial":false},{"d":"09-13","date":"2026-09-13","env":"O","title":"Co & Gal 여의도 한강공원","hr":162.5,"p":93.2,"np":111.0,"p20":112.0,"tss":151.3,"dur":2.31,"dist":52995.3,"eff":97.0,"dec":null,"merged":false,"partial":false},{"d":"09-15","date":"2026-09-15","env":"I","title":"실내 자전거타기","hr":159.3,"p":97.4,"np":114.0,"p20":113.0,"tss":41.8,"dur":0.6,"dist":15334.3,"eff":75.0,"dec":null,"merged":false,"partial":false},{"d":"09-17","date":"2026-09-17","env":"I","title":"실내 자전거타기","hr":143.7,"p":87.4,"np":95.0,"p20":91.5,"tss":68.7,"dur":1.4,"dist":41930.5,"eff":95.0,"dec":-1.04,"merged":false,"partial":false},{"d":"09-20","date":"2026-09-20","env":"I","title":"실내 자전거타기","hr":146.9,"p":96.3,"np":97.0,"p20":98.0,"tss":93.7,"dur":1.83,"dist":60206.6,"eff":97.0,"dec":0.11,"merged":false,"partial":false},{"d":"09-21","date":"2026-09-21","env":"I","title":"실내 자전거타기","hr":166.6,"p":108.3,"np":118.0,"p20":119.1,"tss":60.7,"dur":0.8,"dist":21193.5,"eff":76.0,"dec":null,"merged":false,"partial":false}],"grades":[{"grade":"≤ -2%","wkg":1.66,"power":96.0,"hr":160.0,"n":635},{"grade":"-2~0%","wkg":1.71,"power":99.0,"hr":162.0,"n":12755},{"grade":"0~2%","wkg":1.76,"power":102.0,"hr":165.0,"n":9810},{"grade":"2~4%","wkg":1.95,"power":113.0,"hr":167.0,"n":1315},{"grade":"4~6%","wkg":2.55,"power":148.0,"hr":175.0,"n":667},{"grade":"6~8%","wkg":2.82,"power":163.5,"hr":180.0,"n":60}]};
 const S=D.sessions.slice().sort((a,b)=>a.date.localeCompare(b.date));
+const labels=S.map(x=>x.d);
+const css=getComputedStyle(document.documentElement);
 const C={i:"#12e7f5",o:"#ff2f7f",t:"#a855f7"};
-function lineSet(key,env,color,label){return{label,data:S.map(x=>x.env===env&&x[key]!=null?x[key]:null),borderColor:color,backgroundColor:color,spanGaps:true,tension:.28,pointRadius:4,pointHoverRadius:7,borderWidth:2.6};}
-function longTrend(key,color){
-  const pts=S.map(x=>({t:new Date(x.date).getTime(),v:x[key]})).filter(o=>o.v!=null);
-  if(pts.length<2) return {label:"장기 추세",data:S.map(()=>null),borderColor:color,pointRadius:0,borderDash:[4,8],borderWidth:3,spanGaps:true};
+
+function series(key,env,color,label){
+  return {label,data:S.map(x=>x.env===env&&x[key]!=null?x[key]:null),borderColor:color,backgroundColor:color,
+    spanGaps:true,tension:.28,pointRadius:4,pointHoverRadius:6,borderWidth:2.5};
+}
+function trend(key,color,label){
+  const pts=S.map((x,i)=>({i,v:x[key],t:new Date(x.date).getTime()})).filter(o=>o.v!=null);
+  if(pts.length<2) return {label,data:S.map(()=>null),borderColor:color,backgroundColor:color,spanGaps:true,tension:0,pointRadius:0,borderDash:[4,8],borderWidth:3};
   const t0=pts[0].t;
-  const xs=pts.map(o=>(o.t-t0)/86400000), ys=pts.map(o=>o.v);
-  const xb=xs.reduce((a,b)=>a+b,0)/xs.length, yb=ys.reduce((a,b)=>a+b,0)/ys.length;
+  const xs=pts.map(o=>(o.t-t0)/86400000);
+  const ys=pts.map(o=>o.v);
+  const xb=xs.reduce((a,b)=>a+b,0)/xs.length;
+  const yb=ys.reduce((a,b)=>a+b,0)/ys.length;
   let num=0,den=0;
   for(let j=0;j<xs.length;j++){num+=(xs[j]-xb)*(ys[j]-yb);den+=(xs[j]-xb)*(xs[j]-xb);}
-  const m=den?num/den:0, b=yb-m*xb;
-  return {
-    label:"장기 추세",
-    data:S.map(x=>b+m*((new Date(x.date).getTime()-t0)/86400000)),
-    borderColor:color,pointRadius:0,borderDash:[4,8],borderWidth:3,spanGaps:true
-  };
+  const slope=den?num/den:0;
+  const intercept=yb-slope*xb;
+  return {label,data:S.map(x=>intercept+slope*((new Date(x.date).getTime()-t0)/86400000)),borderColor:color,backgroundColor:color,
+    spanGaps:true,tension:0,pointRadius:0,borderDash:[4,8],borderWidth:3};
 }
-const base={responsive:true,maintainAspectRatio:false,interaction:{mode:"nearest",intersect:false},plugins:{legend:{display:false}},scales:{x:{ticks:{color:"#9aa9ba",maxRotation:45},grid:{color:"#202b38"}},y:{ticks:{color:"#9aa9ba"},grid:{color:"#202b38"}}}};
-new Chart(p20,{type:"line",data:{labels:S.map(x=>x.d),datasets:[lineSet("p20","I",C.i,"실내"),lineSet("p20","O",C.o,"실외"),longTrend("p20",C.t)]},options:base});
-new Chart(np,{type:"line",data:{labels:S.map(x=>x.d),datasets:[lineSet("np","I",C.i,"실내"),lineSet("np","O",C.o,"실외"),longTrend("np",C.t)]},options:base});
-const E=S.filter(x=>x.eff!=null&&x.env==="I"&&x.hr<=155&&x.dur>=0.75);
-function regressionTrend(rows,key){
-  const pts=rows.filter(x=>x[key]!=null).map(x=>({t:new Date(x.date).getTime(),v:x[key]}));
-  if(pts.length<2) return rows.map(()=>null);
-  const t0=pts[0].t;
-  const xs=pts.map(o=>(o.t-t0)/86400000), ys=pts.map(o=>o.v);
-  const xb=xs.reduce((a,b)=>a+b,0)/xs.length, yb=ys.reduce((a,b)=>a+b,0)/ys.length;
-  let num=0,den=0;
-  for(let j=0;j<xs.length;j++){num+=(xs[j]-xb)*(ys[j]-yb);den+=(xs[j]-xb)*(xs[j]-xb);}
-  const m=den?num/den:0, b=yb-m*xb;
-  return rows.map(x=>b+m*((new Date(x.date).getTime()-t0)/86400000));
-}
-const etrend=E.map(x=>x.eff);
-new Chart(eff,{type:"line",data:{labels:E.map(x=>x.d),datasets:[{label:"Power @ HR 145–155",data:etrend,borderColor:C.i,backgroundColor:C.i,tension:.25,pointRadius:4,pointHoverRadius:7,borderWidth:2.8},{label:"장기 추세",data:regressionTrend(E,"eff"),borderColor:C.t,pointRadius:0,borderDash:[4,8],borderWidth:3}]},options:{...base,scales:{...base.scales,y:{min:70,ticks:{color:"#9aa9ba"},grid:{color:"#202b38"}}}}});
+const base={responsive:true,maintainAspectRatio:false,interaction:{mode:"nearest",intersect:false},
+  plugins:{legend:{display:false},tooltip:{displayColors:true}},
+  scales:{x:{ticks:{color:"#9aa9ba",maxRotation:45,minRotation:0},grid:{color:"#202b38"}},
+           y:{ticks:{color:"#9aa9ba"},grid:{color:"#202b38"}}}};
+
+new Chart(document.getElementById("p20"),{type:"line",data:{labels,datasets:[series("p20","I",C.i,"실내"),series("p20","O",C.o,"실외"),trend("p20",C.t,"장기 추세")]},options:base});
+new Chart(document.getElementById("np"),{type:"line",data:{labels,datasets:[series("np","I",C.i,"실내"),series("np","O",C.o,"실외"),trend("np",C.t,"장기 추세")]},options:base});
+
+const E=S.filter(x=>x.eff!=null&&x.env==="I");
+const Ebase={...base,scales:{x:{ticks:{color:"#9aa9ba",maxRotation:45},grid:{color:"#202b38"}},y:{min:70,ticks:{color:"#9aa9ba"},grid:{color:"#202b38"}}}};
+new Chart(document.getElementById("eff"),{type:"line",data:{labels:E.map(x=>x.d),datasets:[{label:"Power @ HR 145–155",data:E.map(x=>x.eff),borderColor:C.i,backgroundColor:C.i,tension:.28,pointRadius:4,pointHoverRadius:6,borderWidth:2.8},{label:"장기 추세",data:(()=>{const v=E.map(x=>x.eff),a=v.length>1?(v.at(-1)-v[0])/(v.length-1):0;const y=v[0]||0;return v.map((_,i)=>y+a*i)})(),borderColor:C.t,pointRadius:0,borderDash:[4,8],borderWidth:3}]},options:Ebase});
+
 const Z=S.filter(x=>x.dec!=null);
-const zdec=Z.map(x=>x.dec);
-new Chart(dec,{type:"line",data:{labels:Z.map(x=>x.d),datasets:[{label:"Decoupling",data:zdec,borderColor:C.i,backgroundColor:C.i,tension:.25,pointRadius:4,pointHoverRadius:7,borderWidth:2.8},{label:"장기 추세",data:regressionTrend(Z,"dec"),borderColor:C.t,pointRadius:0,borderDash:[4,8],borderWidth:3}]},options:base});
-new Chart(grade,{type:"bar",data:{labels:D.grades.map(x=>x.grade),datasets:[{label:"W/kg",data:D.grades.map(x=>x.wkg),backgroundColor:C.o}]},options:{...base,plugins:{...base.plugins,tooltip:{callbacks:{afterLabel:ctx=>{const g=D.grades[ctx.dataIndex];return "Power "+g.power+"W · HR "+g.hr+" · n="+g.n}}}}}});
-const best=S.filter(x=>x.p20!=null).reduce((a,b)=>a.p20>b.p20?a:b);document.getElementById("best20").textContent=best?best.p20:"—";
-document.getElementById("firstEff").textContent=E.length?E[0].eff:"—";document.getElementById("lastEff").textContent=E.length?E.at(-1).eff:"—";
+new Chart(document.getElementById("dec"),{type:"line",data:{labels:Z.map(x=>x.d),datasets:[{label:"Decoupling",data:Z.map(x=>x.dec),borderColor:C.i,backgroundColor:C.i,tension:.25,pointRadius:4,pointHoverRadius:6,borderWidth:2.8},{label:"장기 추세",data:(()=>{const pts=Z.filter(x=>x.dec!=null).map(x=>({t:new Date(x.date).getTime(),v:x.dec}));if(pts.length<2)return Z.map(()=>null);const t0=pts[0].t,xs=pts.map(o=>(o.t-t0)/86400000),ys=pts.map(o=>o.v),xb=xs.reduce((a,b)=>a+b,0)/xs.length,yb=ys.reduce((a,b)=>a+b,0)/ys.length;let num=0,den=0;for(let j=0;j<xs.length;j++){num+=(xs[j]-xb)*(ys[j]-yb);den+=(xs[j]-xb)*(xs[j]-xb);}const m=den?num/den:0,b=yb-m*xb;return Z.map(x=>b+m*((new Date(x.date).getTime()-t0)/86400000))})(),borderColor:C.t,pointRadius:0,borderDash:[4,8],borderWidth:3}]},options:base});
+
+new Chart(document.getElementById("grade",{type:"bar",data:{labels:D.grades.map(x=>x.grade),datasets:[{label:"W/kg",data:D.grades.map(x=>x.wkg),backgroundColor:C.o,borderColor:C.o,borderWidth:1}]},options:{...base,plugins:{...base.plugins,tooltip:{callbacks:{afterLabel:ctx=>{const g=D.grades[ctx.dataIndex];return "Power "+g.power+"W · HR "+g.hr+" · n="+g.n}}}}}});
+
+const best=S.filter(x=>x.p20!=null).reduce((a,b)=>a.p20>b.p20?a:b);
+const ee=E;
+document.getElementById("best20").textContent=best?best.p20:"—";
+document.getElementById("firstEff").textContent=ee.length?ee[0].eff:"—";
+document.getElementById("lastEff").textContent=ee.length?ee.at(-1).eff:"—";
 const z=S.find(x=>x.date==="2026-09-20");document.getElementById("z2").textContent=z?(z.p+"W / HR "+z.hr+" / NP "+z.np+" / decoupling "+z.dec+"%"):"—";
-const b=S.filter(x=>x.p!=null&&x.p>=80&&x.p<=100), im=b.filter(x=>x.env==="I").map(x=>x.hr).sort((a,b)=>a-b), om=b.filter(x=>x.env==="O").map(x=>x.hr).sort((a,b)=>a-b),med=a=>a.length?a[Math.floor(a.length/2)]:null;document.getElementById("gap").textContent=(med(om)!=null&&med(im)!=null)?med(om)-med(im):"—";
-document.getElementById("tbl").innerHTML=S.slice(-14).reverse().map(x=>"<tr><td>"+x.d+"</td><td>"+(x.env==="I"?"실내":"실외")+"</td><td>"+x.title+"</td><td>"+x.dur.toFixed(1)+"h</td><td>"+x.dist.toFixed(1)+"</td><td>"+(x.hr??"—")+"</td><td>"+(x.p??"—")+"</td><td>"+(x.np??"—")+"</td><td>"+(x.p20??"—")+"</td><td>"+(x.tss??"—")+"</td></tr>").join("");
+const band=S.filter(x=>x.p!=null&&x.p>=80&&x.p<=100);const im=band.filter(x=>x.env==="I").map(x=>x.hr).sort((a,b)=>a-b);const om=band.filter(x=>x.env==="O").map(x=>x.hr).sort((a,b)=>a-b);
+const med=a=>a.length?a[Math.floor(a.length/2)]:null; const gap=(med(om)!=null&&med(im)!=null)?med(om)-med(im):null;
+document.getElementById("gap").textContent=gap==null?"—":gap;
+document.getElementById("tbl").innerHTML=S.slice(-12).reverse().map(x=>"<tr><td>"+x.d+"</td><td>"+(x.env==="I"?"실내":"실외")+"</td><td>"+x.title+"</td><td>"+x.dur.toFixed(1)+"h</td><td>"+x.dist.toFixed(1)+"</td><td>"+(x.hr??"—")+"</td><td>"+(x.p??"—")+"</td><td>"+(x.np??"—")+"</td><td>"+(x.p20??"—")+"</td><td>"+(x.tss??"—")+"</td></tr>").join("");
 </script></main></body></html>
