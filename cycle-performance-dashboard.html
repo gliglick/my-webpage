@@ -93,8 +93,12 @@ new Chart(document.getElementById("dec"),{type:"line",data:{labels:Z.map(x=>x.d)
  pointRadius:4,pointHoverRadius:7,borderWidth:2.8},regressionTrend(Z,"dec",C.t)]},options:base});
 
 new Chart(document.getElementById("grade"),{type:"bar",data:{labels:D.grades.map(x=>x.grade),
- datasets:[{label:"W/kg",data:D.grades.map(x=>x.wkg),backgroundColor:C.o,borderColor:C.o,borderWidth:1}]},
- options:{...base,plugins:{...base.plugins,tooltip:{callbacks:{afterLabel:ctx=>{const g=D.grades[ctx.dataIndex];
+ datasets:[{label:"W/kg",data:D.grades.map(x=>x.wkg),backgroundColor:C.o,borderColor:C.o,borderWidth:1,
+ barPercentage:.9,categoryPercentage:.9,maxBarThickness:72}]},
+ options:{...base,layout:{padding:{right:24,left:4}},scales:{...base.scales,
+ x:{...base.scales.x,offset:true},
+ y:{...base.scales.y,beginAtZero:false}},
+ plugins:{...base.plugins,tooltip:{callbacks:{afterLabel:ctx=>{const g=D.grades[ctx.dataIndex];
  return "Power "+g.power+"W · HR "+g.hr+" · n="+g.n;}}}}}});
 
 const p20Rows=S.filter(x=>x.p20!=null); const best=p20Rows.length?p20Rows.reduce((a,b)=>a.p20>b.p20?a:b):null;
