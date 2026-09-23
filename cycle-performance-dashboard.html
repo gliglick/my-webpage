@@ -84,7 +84,7 @@ new Chart(document.getElementById("eff"),{type:"line",data:{labels:E.map(x=>x.d)
 const Z=S.filter(x=>x.dec!=null);
 new Chart(document.getElementById("dec"),{type:"line",data:{labels:Z.map(x=>x.d),datasets:[{label:"Decoupling",data:Z.map(x=>x.dec),borderColor:C.i,backgroundColor:C.i,tension:.25,pointRadius:4,pointHoverRadius:6,borderWidth:2.8},{label:"장기 추세",data:(()=>{const pts=Z.filter(x=>x.dec!=null).map(x=>({t:new Date(x.date).getTime(),v:x.dec}));if(pts.length<2)return Z.map(()=>null);const t0=pts[0].t,xs=pts.map(o=>(o.t-t0)/86400000),ys=pts.map(o=>o.v),xb=xs.reduce((a,b)=>a+b,0)/xs.length,yb=ys.reduce((a,b)=>a+b,0)/ys.length;let num=0,den=0;for(let j=0;j<xs.length;j++){num+=(xs[j]-xb)*(ys[j]-yb);den+=(xs[j]-xb)*(xs[j]-xb);}const m=den?num/den:0,b=yb-m*xb;return Z.map(x=>b+m*((new Date(x.date).getTime()-t0)/86400000))})(),borderColor:C.t,pointRadius:0,borderDash:[4,8],borderWidth:3}]},options:base});
 
-new Chart(document.getElementById("grade",{type:"bar",data:{labels:D.grades.map(x=>x.grade),datasets:[{label:"W/kg",data:D.grades.map(x=>x.wkg),backgroundColor:C.o,borderColor:C.o,borderWidth:1}]},options:{...base,plugins:{...base.plugins,tooltip:{callbacks:{afterLabel:ctx=>{const g=D.grades[ctx.dataIndex];return "Power "+g.power+"W · HR "+g.hr+" · n="+g.n}}}}}});
+new Chart(document.getElementById("grade"),{type:"bar",data:{labels:D.grades.map(x=>x.grade),datasets:[{label:"W/kg",data:D.grades.map(x=>x.wkg),backgroundColor:C.o,borderColor:C.o,borderWidth:1}]},options:{...base,plugins:{...base.plugins,tooltip:{callbacks:{afterLabel:ctx=>{const g=D.grades[ctx.dataIndex];return "Power "+g.power+"W · HR "+g.hr+" · n="+g.n}}}}}});
 
 const best=S.filter(x=>x.p20!=null).reduce((a,b)=>a.p20>b.p20?a:b);
 const ee=E;
