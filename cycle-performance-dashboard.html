@@ -167,7 +167,7 @@ new Chart(document.getElementById("eff"),{type:"scatter",data:{
 },options:{...effOpt,plugins:{...base.plugins,tooltip:{callbacks:{
  label:ctx=>{const r=E[ctx.dataIndex];return r?("HR "+r.hr+" bpm · Power "+r.p+" W · "+r.d):""},
  afterLabel:ctx=>{const r=E[ctx.dataIndex];return r&&r.eff!=null?"HR 145–155 효율값 "+r.eff+" W":"";}
-}}}});
+}}}}});
 
 const Z=S.filter(x=>x.dec!=null);
 new Chart(document.getElementById("dec"),{type:"line",data:{labels:Z.map(x=>x.d),
