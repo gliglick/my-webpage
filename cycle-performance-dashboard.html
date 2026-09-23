@@ -73,8 +73,8 @@ function regressionTrend(rows,key,color){
   return{label:"장기 추세",data:rows.map(r=>b+m*((new Date(r.date).getTime()-t0)/86400000)),
     borderColor:color,backgroundColor:color,spanGaps:true,tension:0,pointRadius:0,borderDash:[4,8],borderWidth:3};
 }
-const base={responsive:true,maintainAspectRatio:false,interaction:{mode:"nearest",intersect:false},
-  plugins:{legend:{display:false},tooltip:{displayColors:true}},
+const base={responsive:true,maintainAspectRatio:false,interaction:{mode:"nearest",intersect:true},
+  plugins:{legend:{display:false},tooltip:{displayColors:true}},onClick:(event,active,chart)=>{if(!active.length){chart.tooltip.setActiveElements([]);chart.update();}} ,
   scales:{x:{ticks:{color:"#9aa9ba",maxRotation:45,minRotation:0},grid:{color:"#202b38"}},
           y:{ticks:{color:"#9aa9ba"},grid:{color:"#202b38"}}}};
 
