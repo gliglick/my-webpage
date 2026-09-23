@@ -1,7 +1,7 @@
 <!doctype html><html lang="ko"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Cycle Performance Lab</title>
-
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <style>
 *{box-sizing:border-box}body{margin:0;background:#080d14;color:#edf4fb;font:14px/1.5 Inter,"Noto Sans KR",sans-serif}
 main{max-width:1180px;margin:auto;padding:22px 14px 56px}h1{margin:0;font-size:28px}h2{margin:0 0 8px;font-size:18px}.sub{color:#91a0b2;font-size:12px;margin-top:4px}
@@ -26,16 +26,16 @@ h1{color:#ffffff}
 <div class="grid">
 <div class="card"><h2>20분 최고 Power — 최근 90일</h2><div class="sub">개별 라이딩 · 실내 CYAN · 실외 MAGENTA · 장기 추세 PURPLE</div><div class="chartbox"><canvas id="p20"></canvas></div><div class="insight"><b>인사이트</b><br>최근 90일의 20분 Power를 개별 세션으로 표시합니다. 단기적인 고점과 변동을 확인하면서 장기 추세도 함께 봅니다.<br>현재 최고 20분 Power는 <b>125W</b>입니다.</div>
 <div class="legend"><span><i class="dot c"></i>실내</span><span><i class="dot p"></i>실외</span><span><i class="dot u"></i>90일 추세</span></div></div>
-<div class="card"><h2>20분 최고 Power — 월간 중앙값 + 최고값</h2><div class="sub">월별 중앙값 + 월간 최고값 · 대표 수준과 고점 확인</div><div class="chartbox"><canvas id="p20m"></canvas></div><div class="insight"><b>인사이트</b><br>월간 중앙값은 특정 고강도 세션 하나에 의해 월간 기준선이 과도하게 움직이는 것을 막아줍니다. 월별 체력 수준의 변화를 보는 용도입니다.</div></div>
+<div class="card"><h2>20분 최고 Power — 월간 중앙값 + 최고값</h2><div class="sub">월별 중앙값 + 월간 최고값 · 중앙값은 기준선, 최고값은 고점 확인</div><div class="chartbox"><canvas id="p20m"></canvas></div><div class="insight"><b>인사이트</b><br>중앙값은 해당 월의 대표적인 체력 수준을, 최고값은 그 달에 실제로 도달한 고점을 보여줍니다.<br>두 값을 함께 보면 <b>평균적인 수준과 고점의 간격</b>을 동시에 확인할 수 있습니다.</div></div>
 </div>
 <div class="grid">
 <div class="card"><h2>Normalized Power — 최근 90일</h2><div class="sub">개별 라이딩 · 실내 CYAN · 실외 MAGENTA · 장기 추세 PURPLE</div><div class="chartbox"><canvas id="np"></canvas></div><div class="insight"><b>인사이트</b><br>최근 90일 NP를 개별 세션으로 표시합니다. 인터벌이나 고강도 세션의 영향까지 포함한 실제 훈련 강도 변화를 확인할 수 있습니다.</div>
 <div class="legend"><span><i class="dot c"></i>실내</span><span><i class="dot p"></i>실외</span><span><i class="dot u"></i>90일 추세</span></div></div>
-<div class="card"><h2>Normalized Power — 월간 중앙값 + 최고값</h2><div class="sub">월별 중앙값 + 월간 최고값 · 대표 수준과 고점 확인</div><div class="chartbox"><canvas id="npm"></canvas></div><div class="insight"><b>인사이트</b><br>월간 중앙값은 운동 종류와 세션별 강도 차이가 큰 환경에서 NP의 대표적인 월간 수준을 보기 적합합니다.</div></div>
+<div class="card"><h2>Normalized Power — 월간 중앙값 + 최고값</h2><div class="sub">월별 중앙값 + 월간 최고값 · 훈련 강도의 대표 수준과 고점</div><div class="chartbox"><canvas id="npm"></canvas></div><div class="insight"><b>인사이트</b><br>NP의 월간 중앙값은 대표적인 훈련 강도를, 최고값은 해당 월의 가장 강한 세션 수준을 보여줍니다.</div></div>
 </div>
 
 <div class="grid">
-<div class="card"><h2>심박수 대비 Power (Zone2 이하)</h2><div class="sub">HR 145–155 bpm · 실내 · 평균 HR ≤155 · 45분 이상</div><div class="chartbox"><canvas id="eff"></canvas></div><div class="insight"><b>인사이트</b><br>HR 145–155에서 낼 수 있는 Power가 초기 약 <b>84W</b>에서 최근 <b>97W</b>까지 상승했습니다.<br>심박을 기준으로 한 유산소 효율이 개선되고 있으며, 현재 약 <b>+15%</b>의 향상이 관찰됩니다.</div></div>
+<div class="card"><h2>심박수 대비 Power (Zone2 이하)</h2><div class="sub">실내 · 45분 이상 · 평균 HR ≤155 bpm · x축 HR / y축 Power</div><div class="chartbox"><canvas id="eff"></canvas></div><div class="insight"><b>인사이트</b><br>같은 심박에서 더 높은 Power가 오른쪽 위가 아닌 <b>위쪽으로 이동</b>하는 것이 유산소 효율 개선입니다.<br>특히 HR 145–155 구간의 Power 수준을 함께 보면 장기적인 유산소 엔진 변화를 확인하기 쉽습니다.</div></div>
 <div class="card"><h2>장시간 Aerobic Decoupling</h2><div class="sub">실내 Z2 유사 세션 · 0%에 가까울수록 후반 효율 저하가 작음</div><div class="chartbox"><canvas id="dec"></canvas></div><div class="insight"><b>인사이트</b><br>장시간 Z2 세션의 대부분은 <b>±3% 안팎</b>으로, 최근 9/17은 -1.0%, 9/20은 +0.1%로 후반 효율이 안정적입니다.<br>단일 이상치보다 90–120분 세션에서 0%에 가까운 상태가 반복되는지를 보는 것이 중요합니다.</div></div>
 </div>
 
@@ -57,139 +57,157 @@ h1{color:#ffffff}
 <h2>전체 데이터</h2><div class="sub">통합된 논리 세션 전체</div>
 <div style="overflow:auto"><table><thead><tr><th>날짜</th><th>구분</th><th>세션</th><th>시간</th><th>거리</th><th>HR</th><th>Power</th><th>NP</th><th>P20</th><th>TSS</th><th>Decoupling</th></tr></thead><tbody id="tbl"></tbody></table></div></div>
 
-
 <script>
-const D={"sessions":[{"d":"06-03","date":"2026-06-03","env":"I","title":"실내 자전거","hr":146.3,"p":83.8,"np":100.0,"p20":93.2,"tss":87.3,"dur":1.44,"dist":26413.8,"eff":84.0,"dec":-3.52,"merged":false,"partial":false},{"d":"06-08","date":"2026-06-08","env":"I","title":"실내 자전거","hr":161.3,"p":96.6,"np":103.0,"p20":110.3,"tss":55.8,"dur":0.87,"dist":17347.7,"eff":57.0,"dec":null,"merged":false,"partial":false},{"d":"06-10","date":"2026-06-10","env":"I","title":"실내 자전거","hr":145.6,"p":83.8,"np":86.0,"p20":88.6,"tss":48.5,"dur":1.09,"dist":20043.5,"eff":88.0,"dec":-0.9,"merged":false,"partial":false},{"d":"06-13","date":"2026-06-13","env":"I","title":"실내 자전거","hr":162.9,"p":96.7,"np":110.0,"p20":112.5,"tss":61.4,"dur":0.84,"dist":16349.4,"eff":81.0,"dec":null,"merged":false,"partial":false},{"d":"06-15","date":"2026-06-15","env":"I","title":"실내 자전거","hr":140.9,"p":83.5,"np":84.0,"p20":85.6,"tss":47.4,"dur":1.1,"dist":20231.9,"eff":87.0,"dec":-0.54,"merged":false,"partial":false},{"d":"06-20","date":"2026-06-20","env":"I","title":"실내 자전거","hr":163.7,"p":107.1,"np":112.0,"p20":113.7,"tss":69.9,"dur":0.92,"dist":19880.0,"eff":115.0,"dec":null,"merged":false,"partial":false},{"d":"06-28","date":"2026-06-28","env":"I","title":"실내 자전거","hr":168.8,"p":99.4,"np":108.0,"p20":110.0,"tss":52.9,"dur":0.76,"dist":22591.6,"eff":86.0,"dec":null,"merged":false,"partial":false},{"d":"06-29","date":"2026-06-29","env":"I","title":"실내 자전거","hr":143.1,"p":83.1,"np":83.0,"p20":85.1,"tss":71.8,"dur":1.7,"dist":50332.4,"eff":84.0,"dec":1.34,"merged":false,"partial":false},{"d":"07-02","date":"2026-07-02","env":"I","title":"실내 자전거","hr":168.3,"p":101.3,"np":118.0,"p20":115.6,"tss":54.3,"dur":0.64,"dist":22494.0,"eff":79.0,"dec":null,"merged":false,"partial":false},{"d":"07-05","date":"2026-07-05","env":"I","title":"실내 자전거","hr":144.2,"p":89.0,"np":89.0,"p20":90.7,"tss":68.1,"dur":1.4,"dist":42810.9,"eff":90.0,"dec":1.86,"merged":false,"partial":false},{"d":"07-08","date":"2026-07-08","env":"I","title":"실내 자전거","hr":158.0,"p":99.8,"np":107.0,"p20":108.1,"tss":75.9,"dur":1.1,"dist":32231.5,"eff":75.0,"dec":null,"merged":false,"partial":false},{"d":"07-12","date":"2026-07-12","env":"I","title":"실내 자전거","hr":141.8,"p":81.7,"np":111.0,"p20":93.8,"tss":109.4,"dur":1.47,"dist":45067.7,"eff":90.0,"dec":26.66,"merged":false,"partial":false},{"d":"07-25","date":"2026-07-25","env":"O","title":"한강 왕복 (2 FIT 통합)","hr":159.8,"p":null,"np":null,"p20":null,"tss":null,"dur":4.33,"dist":69540.8,"eff":null,"dec":null,"merged":true,"partial":false},{"d":"07-30","date":"2026-07-30","env":"I","title":"Zwift - Hilltop Hustle in Watopia","hr":152.2,"p":87.3,"np":94.0,"p20":96.5,"tss":53.7,"dur":1.01,"dist":31114.6,"eff":88.0,"dec":1.72,"merged":false,"partial":false},{"d":"08-02","date":"2026-08-02","env":"O","title":"Co&Gal 한강라이딩-63빌딩","hr":167.7,"p":null,"np":null,"p20":null,"tss":null,"dur":2.85,"dist":60360.2,"eff":null,"dec":null,"merged":false,"partial":false},{"d":"08-07","date":"2026-08-07","env":"I","title":"Zwift - Pacer Group Ride with Bernie","hr":147.1,"p":90.3,"np":97.0,"p20":96.0,"tss":82.4,"dur":1.43,"dist":42129.4,"eff":92.0,"dec":2.94,"merged":false,"partial":false},{"d":"08-09","date":"2026-08-09","env":"O","title":"한강라이딩-천호대교","hr":159.9,"p":null,"np":null,"p20":null,"tss":null,"dur":2.96,"dist":62575.2,"eff":null,"dec":null,"merged":false,"partial":false},{"d":"08-14","date":"2026-08-14","env":"I","title":"Zwift - Pacer Group Ride with Bernie","hr":151.6,"p":92.7,"np":108.0,"p20":110.6,"tss":48.4,"dur":0.68,"dist":20161.3,"eff":89.0,"dec":null,"merged":false,"partial":false},{"d":"08-16","date":"2026-08-16","env":"I","title":"Zwift - FTP Ramp Test [Lite]","hr":160.5,"p":98.1,"np":120.0,"p20":103.4,"tss":31.6,"dur":0.37,"dist":9606.7,"eff":74.0,"dec":null,"merged":false,"partial":false},{"d":"08-17","date":"2026-08-17","env":"I","title":"Zwift - Danger Noodle in Watopia","hr":146.6,"p":88.9,"np":90.0,"p20":92.0,"tss":65.6,"dur":1.34,"dist":40861.0,"eff":91.0,"dec":1.99,"merged":false,"partial":false},{"d":"08-19","date":"2026-08-19","env":"I","title":"Zwift - Pacer Group Ride with Miguel","hr":161.1,"p":110.3,"np":114.0,"p20":112.9,"tss":70.6,"dur":1.0,"dist":31279.5,"eff":108.0,"dec":null,"merged":false,"partial":false},{"d":"08-23","date":"2026-08-23","env":"I","title":"실내 자전거타기","hr":146.1,"p":82.6,"np":89.0,"p20":91.8,"tss":54.2,"dur":1.26,"dist":40660.4,"eff":84.0,"dec":-1.28,"merged":false,"partial":false},{"d":"09-01","date":"2026-09-01","env":"I","title":"실내 자전거타기","hr":150.3,"p":84.5,"np":85.0,"p20":88.5,"tss":39.8,"dur":1.01,"dist":35270.6,"eff":85.0,"dec":-5.96,"merged":false,"partial":false},{"d":"09-06","date":"2026-09-06","env":"O","title":"Co&Gal 두물머리 왕복 (CSV 2분할 · FIT 상세 1구간)","hr":161.1,"p":84.8,"np":101.0,"p20":115.6,"tss":211.7,"dur":5.12,"dist":56.9,"eff":88.5,"dec":null,"merged":false,"partial":true},{"d":"09-09","date":"2026-09-09","env":"I","title":"실내 자전거타기","hr":147.4,"p":88.3,"np":91.0,"p20":95.5,"tss":45.7,"dur":1.02,"dist":30848.5,"eff":93.0,"dec":11.52,"merged":false,"partial":false},{"d":"09-11","date":"2026-09-11","env":"O","title":"아이유 고개","hr":157.5,"p":84.5,"np":104.0,"p20":103.4,"tss":148.3,"dur":2.49,"dist":52548.7,"eff":94.0,"dec":null,"merged":false,"partial":false},{"d":"09-13","date":"2026-09-13","env":"O","title":"Co & Gal 여의도 한강공원","hr":162.5,"p":93.2,"np":111.0,"p20":112.0,"tss":151.3,"dur":2.31,"dist":52995.3,"eff":97.0,"dec":null,"merged":false,"partial":false},{"d":"09-15","date":"2026-09-15","env":"I","title":"실내 자전거타기","hr":159.3,"p":97.4,"np":114.0,"p20":113.0,"tss":41.8,"dur":0.6,"dist":15334.3,"eff":75.0,"dec":null,"merged":false,"partial":false},{"d":"09-17","date":"2026-09-17","env":"I","title":"실내 자전거타기","hr":143.7,"p":87.4,"np":95.0,"p20":91.5,"tss":68.7,"dur":1.4,"dist":41930.5,"eff":95.0,"dec":-1.04,"merged":false,"partial":false},{"d":"09-20","date":"2026-09-20","env":"I","title":"실내 자전거타기","hr":146.9,"p":96.3,"np":97.0,"p20":98.0,"tss":93.7,"dur":1.83,"dist":60206.6,"eff":97.0,"dec":0.11,"merged":false,"partial":false},{"d":"09-21","date":"2026-09-21","env":"I","title":"실내 자전거타기","hr":166.6,"p":108.3,"np":118.0,"p20":119.1,"tss":60.7,"dur":0.8,"dist":21193.5,"eff":76.0,"dec":null,"merged":false,"partial":false},{"d":"09-23","date":"2026-09-23","env":"I","title":"Zwift","hr":164,"p":112.5,"np":117.8,"p20":125,"tss":52.3,"dur":0.67,"dist":17537.9,"eff":null,"dec":null,"merged":false,"partial":false}],"grades":[{"grade":"≤ -2%","wkg":1.66,"power":96.0,"hr":160.0,"n":635},{"grade":"-2~0%","wkg":1.71,"power":99.0,"hr":162.0,"n":12755},{"grade":"0~2%","wkg":1.76,"power":102.0,"hr":165.0,"n":9810},{"grade":"2~4%","wkg":1.95,"power":113.0,"hr":167.0,"n":1315},{"grade":"4~6%","wkg":2.55,"power":148.0,"hr":175.0,"n":667},{"grade":"6~8%","wkg":2.82,"power":163.5,"hr":180.0,"n":60}]};
-(function(){
-"use strict";
-var S=D.sessions.slice().sort(function(a,b){return a.date.localeCompare(b.date);});
-var C={i:"#12e7f5",o:"#ff2f7f",t:"#a855f7"};
-var NS="http://www.w3.org/2000/svg";
-var lastPointClick={time:0,date:null};
 
-function esc(v){return String(v==null?"":v).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");}
-function txt(svg,x,y,s,size,color,anchor){
-  var t=document.createElementNS(NS,"text");
-  t.setAttribute("x",x); t.setAttribute("y",y); t.setAttribute("fill",color||"#9aa9ba");
-  t.setAttribute("font-size",size||11); t.setAttribute("font-family",'Inter,"Noto Sans KR",sans-serif');
-  t.setAttribute("text-anchor",anchor||"middle"); t.textContent=s; svg.appendChild(t);
-}
-function svgBase(el){
-  el.innerHTML="";
-  var w=Math.max(420,el.clientWidth-16), h=Math.max(250,el.clientHeight-16);
-  var svg=document.createElementNS(NS,"svg");
-  svg.setAttribute("viewBox","0 0 "+w+" "+h);
-  svg.setAttribute("width","100%"); svg.setAttribute("height","100%");
-  svg.setAttribute("preserveAspectRatio","none");
-  svg.style.display="block";
-  el.appendChild(svg);
-  return {svg:svg,w:w,h:h};
-}
-function trend(rows,key){
-  var p=rows.filter(function(r){return r[key]!=null;}).map(function(r){return {t:new Date(r.date+"T00:00:00").getTime(),v:+r[key]};});
-  if(p.length<2)return function(){return null;};
-  var t0=p[0].t,xs=p.map(function(a){return (a.t-t0)/86400000;}),ys=p.map(function(a){return a.v;});
-  var xb=xs.reduce(function(a,b){return a+b;},0)/xs.length,yb=ys.reduce(function(a,b){return a+b;},0)/ys.length,num=0,den=0;
-  for(var i=0;i<xs.length;i++){num+=(xs[i]-xb)*(ys[i]-yb);den+=Math.pow(xs[i]-xb,2);}
-  var m=den?num/den:0,b=yb-m*xb;
-  return function(r){return b+m*((new Date(r.date+"T00:00:00").getTime()-t0)/86400000);};
-}
-function bindRow(row){
-  var now=Date.now();
-  if(lastPointClick.date===row.date && now-lastPointClick.time<650){
-    var trs=document.querySelectorAll("#tbl tr");
-    for(var i=0;i<trs.length;i++) trs[i].classList.toggle("selected-row",trs[i].getAttribute("data-date")===row.date);
-    var target=document.querySelector('#tbl tr[data-date="'+row.date+'"]');
-    if(target)target.scrollIntoView({behavior:"smooth",block:"center"});
-    lastPointClick={time:0,date:null};
-  }else{lastPointClick={time:now,date:row.date};}
-}
-function lineChart(id,rows,series,yMin,yMax){
-  var el=document.getElementById(id), base=svgBase(el),svg=base.svg,W=base.w,H=base.h;
-  var L=54,R=18,T=18,B=38,pw=W-L-R,ph=H-T-B,n=rows.length;
-  if(!n)return;
-  var x=function(i){return L+(n===1?pw/2:(i/(n-1))*pw);};
-  var y=function(v){return T+ph-(v-yMin)/(yMax-yMin)*ph;};
-  for(var k=0;k<=5;k++){
-    var yy=T+ph*k/5,v=yMax-(yMax-yMin)*k/5;
-    var q=document.createElementNS(NS,"line"); q.setAttribute("x1",L);q.setAttribute("x2",W-R);q.setAttribute("y1",yy);q.setAttribute("y2",yy);q.setAttribute("stroke","#202b38");svg.appendChild(q);
-    txt(svg,L-8,yy+4,String(Math.round(v)),10,"#9aa9ba","end");
-  }
-  rows.forEach(function(r,i){if(i===0||i===n-1||i%Math.max(1,Math.ceil(n/7))===0)txt(svg,x(i),H-12,r.d,10,"#9aa9ba");});
-  series.forEach(function(s){
-    var path="",started=false;
-    rows.forEach(function(r,i){
-      var v=s.value(r,i); if(v==null||!isFinite(v)){started=false;return;}
-      path+=(started?"L":"M")+x(i)+" "+y(v);started=true;
-    });
-    if(path){
-      var pth=document.createElementNS(NS,"path");pth.setAttribute("d",path);pth.setAttribute("fill","none");pth.setAttribute("stroke",s.color);pth.setAttribute("stroke-width",s.width||2.5);pth.setAttribute("stroke-linecap","round");pth.setAttribute("stroke-linejoin","round");
-      if(s.dash)pth.setAttribute("stroke-dasharray","6 7");svg.appendChild(pth);
+let lastPointClick={time:0,date:null};
+function chartClickHandler(rows){
+  return function(event, elements){
+    if(!elements || !elements.length) return;
+    const row=rows[elements[0].index];
+    if(!row || !row.date) return;
+    const now=Date.now();
+    if(lastPointClick.date===row.date && now-lastPointClick.time<650){
+      document.querySelectorAll("#tbl tr").forEach(tr=>{
+        tr.classList.toggle("selected-row",tr.getAttribute("data-date")===row.date);
+      });
+      const target=document.querySelector('#tbl tr[data-date="'+row.date+'"]');
+      if(target) target.scrollIntoView({behavior:"smooth",block:"center"});
+      lastPointClick={time:0,date:null};
+    }else{
+      lastPointClick={time:now,date:row.date};
     }
-    if(!s.hidePoints)rows.forEach(function(r,i){
-      var v=s.value(r,i);if(v==null||!isFinite(v))return;
-      var c=document.createElementNS(NS,"circle");c.setAttribute("cx",x(i));c.setAttribute("cy",y(v));c.setAttribute("r",s.r||4.5);c.setAttribute("fill",s.color);c.style.cursor="pointer";
-      var tt=document.createElementNS(NS,"title");tt.textContent=r.date+" · "+s.label+" · "+v; c.appendChild(tt);
-      c.addEventListener("click",function(){bindRow(r);});svg.appendChild(c);
-    });
-  });
+  };
 }
-function monthly(rows,key){
-  var g={};
-  rows.forEach(function(r){if(r[key]==null)return;var m=r.date.slice(0,7);if(!g[m])g[m]=[];g[m].push(+r[key]);});
-  return Object.keys(g).sort().map(function(m){
-    var a=g[m].sort(function(x,y){return x-y;}),med=a.length%2?a[(a.length-1)/2]:(a[a.length/2-1]+a[a.length/2])/2;
-    return {month:m,value:med,max:a[a.length-1],n:a.length};
-  });
-}
-function monthlyChart(id,rows,lo,hi){
-  var el=document.getElementById(id),base=svgBase(el),svg=base.svg,W=base.w,H=base.h,L=54,R=18,T=18,B=38,pw=W-L-R,ph=H-T-B,n=rows.length;
-  if(!n)return;
-  var x=function(i){return L+(n===1?pw/2:(i/(n-1))*pw);},y=function(v){return T+ph-(v-lo)/(hi-lo)*ph;};
-  for(var k=0;k<=5;k++){var yy=T+ph*k/5,v=hi-(hi-lo)*k/5,q=document.createElementNS(NS,"line");q.setAttribute("x1",L);q.setAttribute("x2",W-R);q.setAttribute("y1",yy);q.setAttribute("y2",yy);q.setAttribute("stroke","#202b38");svg.appendChild(q);txt(svg,L-8,yy+4,String(Math.round(v)),10,"#9aa9ba","end");}
-  function draw(key,color,label){
-    var path="";
-    rows.forEach(function(r,i){path+=(i?"L":"M")+x(i)+" "+y(r[key]);});
-    var p=document.createElementNS(NS,"path");p.setAttribute("d",path);p.setAttribute("fill","none");p.setAttribute("stroke",color);p.setAttribute("stroke-width","2.8");p.setAttribute("stroke-linecap","round");svg.appendChild(p);
-    rows.forEach(function(r,i){var c=document.createElementNS(NS,"circle");c.setAttribute("cx",x(i));c.setAttribute("cy",y(r[key]));c.setAttribute("r","5");c.setAttribute("fill",color);var tt=document.createElementNS(NS,"title");tt.textContent=r.month+" · "+label+" · "+r[key]+" · "+r.n+"회";c.appendChild(tt);svg.appendChild(c);});
-  }
-  draw("value",C.i,"중앙값");draw("max",C.t,"최고값");
-  rows.forEach(function(r,i){txt(svg,x(i),H-12,r.month,10,"#9aa9ba");});
-}
-function barChart(id,rows){
-  var el=document.getElementById(id),base=svgBase(el),svg=base.svg,W=base.w,H=base.h,L=54,R=18,T=18,B=52,pw=W-L-R,ph=H-T-B,hi=Math.ceil(Math.max.apply(null,rows.map(function(r){return r.wkg;}))*10)/10;
-  for(var k=0;k<=4;k++){var yy=T+ph*k/4,v=hi-(hi*k/4),q=document.createElementNS(NS,"line");q.setAttribute("x1",L);q.setAttribute("x2",W-R);q.setAttribute("y1",yy);q.setAttribute("y2",yy);q.setAttribute("stroke","#202b38");svg.appendChild(q);txt(svg,L-8,yy+4,v.toFixed(1),10,"#9aa9ba","end");}
-  rows.forEach(function(r,i){var bw=pw/rows.length*.7,x=L+pw*(i+.15)/rows.length,h=r.wkg/hi*ph,y=T+ph-h,rect=document.createElementNS(NS,"rect");rect.setAttribute("x",x);rect.setAttribute("y",y);rect.setAttribute("width",bw);rect.setAttribute("height",h);rect.setAttribute("rx","4");rect.setAttribute("fill",C.o);var tt=document.createElementNS(NS,"title");tt.textContent=r.grade+" · "+r.wkg+" W/kg · "+r.power+"W · HR "+r.hr+" · n="+r.n;rect.appendChild(tt);svg.appendChild(rect);txt(svg,x+bw/2,H-22,r.grade,10,"#9aa9ba");txt(svg,x+bw/2,y-7,r.wkg.toFixed(2),10,"#edf4fb");});
-}
-function render(){
-  var latest=new Date(S[S.length-1].date+"T00:00:00"),cutoff=new Date(latest);cutoff.setDate(cutoff.getDate()-89);
-  var R90=S.filter(function(x){return new Date(x.date+"T00:00:00")>=cutoff;});
-  var p20t=trend(R90,"p20"),npt=trend(R90,"np");
-  lineChart("p20",R90,[{label:"실내",color:C.i,value:function(r){return r.env==="I"?r.p20:null;}},{label:"실외",color:C.o,value:function(r){return r.env==="O"?r.p20:null;}},{label:"90일 추세",color:C.t,value:p20t,width:3,dash:true,hidePoints:true}],70,140);
-  monthlyChart("p20m",monthly(S,"p20"),70,140);
-  lineChart("np",R90,[{label:"실내",color:C.i,value:function(r){return r.env==="I"?r.np:null;}},{label:"실외",color:C.o,value:function(r){return r.env==="O"?r.np:null;}},{label:"90일 추세",color:C.t,value:npt,width:3,dash:true,hidePoints:true}],75,135);
-  monthlyChart("npm",monthly(S,"np"),75,135);
-  var E=S.filter(function(x){return x.eff!=null&&x.env==="I"&&x.hr<=155&&x.dur>=0.75;}),et=trend(E,"eff");
-  lineChart("eff",E,[{label:"Power @ HR 145–155",color:C.i,value:function(r){return r.eff;}},{label:"추세",color:C.t,value:et,width:3,dash:true,hidePoints:true}],70,105);
-  var Z=S.filter(function(x){return x.dec!=null;}),zt=trend(Z,"dec");
-  lineChart("dec",Z,[{label:"Decoupling",color:C.i,value:function(r){return r.dec;}},{label:"추세",color:C.t,value:zt,width:3,dash:true,hidePoints:true}],-10,30);
-  barChart("grade",D.grades);
 
-  var p20Rows=S.filter(function(x){return x.p20!=null;}),best=p20Rows.reduce(function(a,b){return a.p20>b.p20?a:b;});
-  document.getElementById("best20").textContent=best?best.p20:"—";
-  document.getElementById("firstEff").textContent=E.length?E[0].eff:"—";
-  document.getElementById("lastEff").textContent=E.length?E[E.length-1].eff:"—";
-  var z=S.filter(function(x){return x.date==="2026-09-20";})[0];
-  document.getElementById("z2").textContent=z?(z.p+"W / HR "+z.hr+" / NP "+z.np+" / decoupling "+z.dec+"%"):"—";
-  var band=S.filter(function(x){return x.p!=null&&x.p>=80&&x.p<=100;}),im=band.filter(function(x){return x.env==="I";}).map(function(x){return x.hr;}).sort(function(a,b){return a-b;}),om=band.filter(function(x){return x.env==="O";}).map(function(x){return x.hr;}).sort(function(a,b){return a-b;});
-  function med(a){return a.length?a[Math.floor(a.length/2)]:null;} var gap=med(im)!=null&&med(om)!=null?med(om)-med(im):null;document.getElementById("gap").textContent=gap==null?"—":gap;
+const D={"sessions":[{"d":"06-03","date":"2026-06-03","env":"I","title":"실내 자전거","hr":146.3,"p":83.8,"np":100.0,"p20":93.2,"tss":87.3,"dur":1.44,"dist":26413.8,"eff":84.0,"dec":-3.52,"merged":false,"partial":false},{"d":"06-08","date":"2026-06-08","env":"I","title":"실내 자전거","hr":161.3,"p":96.6,"np":103.0,"p20":110.3,"tss":55.8,"dur":0.87,"dist":17347.7,"eff":57.0,"dec":null,"merged":false,"partial":false},{"d":"06-10","date":"2026-06-10","env":"I","title":"실내 자전거","hr":145.6,"p":83.8,"np":86.0,"p20":88.6,"tss":48.5,"dur":1.09,"dist":20043.5,"eff":88.0,"dec":-0.9,"merged":false,"partial":false},{"d":"06-13","date":"2026-06-13","env":"I","title":"실내 자전거","hr":162.9,"p":96.7,"np":110.0,"p20":112.5,"tss":61.4,"dur":0.84,"dist":16349.4,"eff":81.0,"dec":null,"merged":false,"partial":false},{"d":"06-15","date":"2026-06-15","env":"I","title":"실내 자전거","hr":140.9,"p":83.5,"np":84.0,"p20":85.6,"tss":47.4,"dur":1.1,"dist":20231.9,"eff":87.0,"dec":-0.54,"merged":false,"partial":false},{"d":"06-20","date":"2026-06-20","env":"I","title":"실내 자전거","hr":163.7,"p":107.1,"np":112.0,"p20":113.7,"tss":69.9,"dur":0.92,"dist":19880.0,"eff":115.0,"dec":null,"merged":false,"partial":false},{"d":"06-28","date":"2026-06-28","env":"I","title":"실내 자전거","hr":168.8,"p":99.4,"np":108.0,"p20":110.0,"tss":52.9,"dur":0.76,"dist":22591.6,"eff":86.0,"dec":null,"merged":false,"partial":false},{"d":"06-29","date":"2026-06-29","env":"I","title":"실내 자전거","hr":143.1,"p":83.1,"np":83.0,"p20":85.1,"tss":71.8,"dur":1.7,"dist":50332.4,"eff":84.0,"dec":1.34,"merged":false,"partial":false},{"d":"07-02","date":"2026-07-02","env":"I","title":"실내 자전거","hr":168.3,"p":101.3,"np":118.0,"p20":115.6,"tss":54.3,"dur":0.64,"dist":22494.0,"eff":79.0,"dec":null,"merged":false,"partial":false},{"d":"07-05","date":"2026-07-05","env":"I","title":"실내 자전거","hr":144.2,"p":89.0,"np":89.0,"p20":90.7,"tss":68.1,"dur":1.4,"dist":42810.9,"eff":90.0,"dec":1.86,"merged":false,"partial":false},{"d":"07-08","date":"2026-07-08","env":"I","title":"실내 자전거","hr":158.0,"p":99.8,"np":107.0,"p20":108.1,"tss":75.9,"dur":1.1,"dist":32231.5,"eff":75.0,"dec":null,"merged":false,"partial":false},{"d":"07-12","date":"2026-07-12","env":"I","title":"실내 자전거","hr":141.8,"p":81.7,"np":111.0,"p20":93.8,"tss":109.4,"dur":1.47,"dist":45067.7,"eff":90.0,"dec":26.66,"merged":false,"partial":false},{"d":"07-25","date":"2026-07-25","env":"O","title":"한강 왕복 (2 FIT 통합)","hr":159.8,"p":null,"np":null,"p20":null,"tss":null,"dur":4.33,"dist":69540.8,"eff":null,"dec":null,"merged":true,"partial":false},{"d":"07-30","date":"2026-07-30","env":"I","title":"Zwift - Hilltop Hustle in Watopia","hr":152.2,"p":87.3,"np":94.0,"p20":96.5,"tss":53.7,"dur":1.01,"dist":31114.6,"eff":88.0,"dec":1.72,"merged":false,"partial":false},{"d":"08-02","date":"2026-08-02","env":"O","title":"Co&Gal 한강라이딩-63빌딩","hr":167.7,"p":null,"np":null,"p20":null,"tss":null,"dur":2.85,"dist":60360.2,"eff":null,"dec":null,"merged":false,"partial":false},{"d":"08-07","date":"2026-08-07","env":"I","title":"Zwift - Pacer Group Ride with Bernie","hr":147.1,"p":90.3,"np":97.0,"p20":96.0,"tss":82.4,"dur":1.43,"dist":42129.4,"eff":92.0,"dec":2.94,"merged":false,"partial":false},{"d":"08-09","date":"2026-08-09","env":"O","title":"한강라이딩-천호대교","hr":159.9,"p":null,"np":null,"p20":null,"tss":null,"dur":2.96,"dist":62575.2,"eff":null,"dec":null,"merged":false,"partial":false},{"d":"08-14","date":"2026-08-14","env":"I","title":"Zwift - Pacer Group Ride with Bernie","hr":151.6,"p":92.7,"np":108.0,"p20":110.6,"tss":48.4,"dur":0.68,"dist":20161.3,"eff":89.0,"dec":null,"merged":false,"partial":false},{"d":"08-16","date":"2026-08-16","env":"I","title":"Zwift - FTP Ramp Test [Lite]","hr":160.5,"p":98.1,"np":120.0,"p20":103.4,"tss":31.6,"dur":0.37,"dist":9606.7,"eff":74.0,"dec":null,"merged":false,"partial":false},{"d":"08-17","date":"2026-08-17","env":"I","title":"Zwift - Danger Noodle in Watopia","hr":146.6,"p":88.9,"np":90.0,"p20":92.0,"tss":65.6,"dur":1.34,"dist":40861.0,"eff":91.0,"dec":1.99,"merged":false,"partial":false},{"d":"08-19","date":"2026-08-19","env":"I","title":"Zwift - Pacer Group Ride with Miguel","hr":161.1,"p":110.3,"np":114.0,"p20":112.9,"tss":70.6,"dur":1.0,"dist":31279.5,"eff":108.0,"dec":null,"merged":false,"partial":false},{"d":"08-23","date":"2026-08-23","env":"I","title":"실내 자전거타기","hr":146.1,"p":82.6,"np":89.0,"p20":91.8,"tss":54.2,"dur":1.26,"dist":40660.4,"eff":84.0,"dec":-1.28,"merged":false,"partial":false},{"d":"09-01","date":"2026-09-01","env":"I","title":"실내 자전거타기","hr":150.3,"p":84.5,"np":85.0,"p20":88.5,"tss":39.8,"dur":1.01,"dist":35270.6,"eff":85.0,"dec":-5.96,"merged":false,"partial":false},{"d":"09-06","date":"2026-09-06","env":"O","title":"Co&Gal 두물머리 왕복 (CSV 2분할 · FIT 상세 1구간)","hr":161.1,"p":84.8,"np":101.0,"p20":115.6,"tss":211.7,"dur":5.12,"dist":56.9,"eff":88.5,"dec":null,"merged":false,"partial":true},{"d":"09-09","date":"2026-09-09","env":"I","title":"실내 자전거타기","hr":147.4,"p":88.3,"np":91.0,"p20":95.5,"tss":45.7,"dur":1.02,"dist":30848.5,"eff":93.0,"dec":11.52,"merged":false,"partial":false},{"d":"09-11","date":"2026-09-11","env":"O","title":"아이유 고개","hr":157.5,"p":84.5,"np":104.0,"p20":103.4,"tss":148.3,"dur":2.49,"dist":52548.7,"eff":94.0,"dec":null,"merged":false,"partial":false},{"d":"09-13","date":"2026-09-13","env":"O","title":"Co & Gal 여의도 한강공원","hr":162.5,"p":93.2,"np":111.0,"p20":112.0,"tss":151.3,"dur":2.31,"dist":52995.3,"eff":97.0,"dec":null,"merged":false,"partial":false},{"d":"09-15","date":"2026-09-15","env":"I","title":"실내 자전거타기","hr":159.3,"p":97.4,"np":114.0,"p20":113.0,"tss":41.8,"dur":0.6,"dist":15334.3,"eff":75.0,"dec":null,"merged":false,"partial":false},{"d":"09-17","date":"2026-09-17","env":"I","title":"실내 자전거타기","hr":143.7,"p":87.4,"np":95.0,"p20":91.5,"tss":68.7,"dur":1.4,"dist":41930.5,"eff":95.0,"dec":-1.04,"merged":false,"partial":false},{"d":"09-20","date":"2026-09-20","env":"I","title":"실내 자전거타기","hr":146.9,"p":96.3,"np":97.0,"p20":98.0,"tss":93.7,"dur":1.83,"dist":60206.6,"eff":97.0,"dec":0.11,"merged":false,"partial":false},{"d":"09-21","date":"2026-09-21","env":"I","title":"실내 자전거타기","hr":166.6,"p":108.3,"np":118.0,"p20":119.1,"tss":60.7,"dur":0.8,"dist":21193.5,"eff":76.0,"dec":null,"merged":false,"partial":false},{"d":"09-23","date":"2026-09-23","env":"I","title":"Zwift","hr":164,"p":112.5,"np":117.8,"p20":125,"tss":52.3,"dur":0.67,"dist":17537.9,"eff":null,"dec":null,"merged":false,"partial":false}],"grades":[{"grade":"≤ -2%","wkg":1.66,"power":96.0,"hr":160.0,"n":635},{"grade":"-2~0%","wkg":1.71,"power":99.0,"hr":162.0,"n":12755},{"grade":"0~2%","wkg":1.76,"power":102.0,"hr":165.0,"n":9810},{"grade":"2~4%","wkg":1.95,"power":113.0,"hr":167.0,"n":1315},{"grade":"4~6%","wkg":2.55,"power":148.0,"hr":175.0,"n":667},{"grade":"6~8%","wkg":2.82,"power":163.5,"hr":180.0,"n":60}]};
+const S=D.sessions.slice().sort((a,b)=>a.date.localeCompare(b.date));
+const C={i:"#12e7f5",o:"#ff2f7f",t:"#a855f7"};
 
-  var weekMap={};
-  S.forEach(function(x){var d=new Date(x.date+"T00:00:00"),day=(d.getDay()+6)%7;d.setDate(d.getDate()-day);var key=d.toISOString().slice(0,10);if(!weekMap[key])weekMap[key]={n:0,h:0,dist:0,tss:0,p:[],hr:[]};var w=weekMap[key];w.n++;w.h+=+x.dur||0;w.dist+=+x.dist||0;if(x.tss!=null)w.tss+=+x.tss;if(x.p!=null)w.p.push(+x.p);if(x.hr!=null)w.hr.push(+x.hr);});
-  function avg(a){return a.length?a.reduce(function(x,y){return x+y;},0)/a.length:null;}
-  document.getElementById("weeklyTbl").innerHTML=Object.keys(weekMap).sort().reverse().map(function(k){var w=weekMap[k];return "<tr><td>"+k+"</td><td>"+w.n+"</td><td>"+w.h.toFixed(1)+"h</td><td>"+w.dist.toFixed(1)+"</td><td>"+w.tss.toFixed(1)+"</td><td>"+(avg(w.p)!=null?avg(w.p).toFixed(1):"—")+"</td><td>"+(avg(w.hr)!=null?avg(w.hr).toFixed(1):"—")+"</td></tr>";}).join("");
-  document.getElementById("tbl").innerHTML=S.slice().reverse().map(function(x){return "<tr data-date=\""+x.date+"\"><td>"+x.d+"</td><td>"+(x.env==="I"?"실내":"실외")+"</td><td>"+esc(x.title)+"</td><td>"+x.dur.toFixed(1)+"h</td><td>"+x.dist.toFixed(1)+"</td><td>"+(x.hr==null?"—":x.hr)+"</td><td>"+(x.p==null?"—":x.p)+"</td><td>"+(x.np==null?"—":x.np)+"</td><td>"+(x.p20==null?"—":x.p20)+"</td><td>"+(x.tss==null?"—":x.tss)+"</td><td>"+(x.dec==null?"—":x.dec.toFixed(2)+"%")+"</td></tr>";}).join("");
+function lineDataset(rows,key,env,color,label){
+  return {label,data:rows.map(x=>x.env===env&&x[key]!=null?x[key]:null),
+    borderColor:color,backgroundColor:color,spanGaps:true,tension:.25,borderWidth:2.5,
+    pointRadius:4,pointHoverRadius:7};
 }
-function boot(){render();window.addEventListener("resize",render);}
-if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",boot);else boot();
-})();</script></main></body></html>
+function regressionTrend(rows,key,color){
+  const pts=rows.filter(x=>x[key]!=null).map(x=>({t:new Date(x.date).getTime(),v:Number(x[key])}));
+  if(pts.length<2)return{label:"장기 추세",data:rows.map(()=>null),borderColor:color,pointRadius:0,borderDash:[4,8],borderWidth:3};
+  const t0=pts[0].t;
+  const xs=pts.map(p=>(p.t-t0)/86400000), ys=pts.map(p=>p.v);
+  const xb=xs.reduce((a,b)=>a+b,0)/xs.length, yb=ys.reduce((a,b)=>a+b,0)/ys.length;
+  let num=0,den=0;
+  for(let i=0;i<xs.length;i++){num+=(xs[i]-xb)*(ys[i]-yb);den+=(xs[i]-xb)*(xs[i]-xb);}
+  const m=den?num/den:0,b=yb-m*xb;
+  return{label:"장기 추세",data:rows.map(r=>b+m*((new Date(r.date).getTime()-t0)/86400000)),
+    borderColor:color,backgroundColor:color,spanGaps:true,tension:0,pointRadius:0,borderDash:[4,8],borderWidth:3};
+}
+const base={responsive:true,maintainAspectRatio:false,interaction:{mode:"nearest",intersect:true},
+  plugins:{legend:{display:false},tooltip:{displayColors:true}},
+  scales:{x:{ticks:{color:"#9aa9ba",maxRotation:45,minRotation:0},grid:{color:"#202b38"}},
+          y:{ticks:{color:"#9aa9ba"},grid:{color:"#202b38"}}}};
+
+const latestDate=new Date(S[S.length-1].date+"T00:00:00");
+const cutoff90=new Date(latestDate); cutoff90.setDate(cutoff90.getDate()-89);
+const R90=S.filter(x=>new Date(x.date+"T00:00:00")>=cutoff90);
+function monthlyMedian(rows,key){
+  const groups={};
+  rows.filter(x=>x[key]!=null).forEach(x=>{
+    const m=x.date.slice(0,7);
+    if(!groups[m]) groups[m]=[];
+    groups[m].push(Number(x[key]));
+  });
+  const median=a=>{a=a.slice().sort((x,y)=>x-y); const n=a.length; return n?((n%2)?a[(n-1)/2]:(a[n/2-1]+a[n/2])/2):null;};
+  return Object.keys(groups).sort().map(m=>({month:m,value:median(groups[m]),n:groups[m].length}));
+}
+const p20M=monthlyMedian(S,"p20");
+const npM=monthlyMedian(S,"np");
+function monthlyMax(rows,key){
+  const groups={};
+  rows.filter(x=>x[key]!=null).forEach(x=>{
+    const m=x.date.slice(0,7);
+    if(!groups[m]) groups[m]=[];
+    groups[m].push(Number(x[key]));
+  });
+  return Object.keys(groups).sort().map(m=>({month:m,value:Math.max(...groups[m]),n:groups[m].length}));
+}
+const p20Max=monthlyMax(S,"p20");
+const npMax=monthlyMax(S,"np");
+
+new Chart(document.getElementById("p20"),{type:"line",data:{labels:R90.map(x=>x.d),
+ datasets:[lineDataset(R90,"p20","I",C.i,"실내"),lineDataset(R90,"p20","O",C.o,"실외"),regressionTrend(R90,"p20",C.t)]},
+ options:{...base,onClick:chartClickHandler(R90),scales:{...base.scales,y:{min:70,max:140,ticks:{color:"#9aa9ba",stepSize:10},grid:{color:"#202b38"}}}}});
+
+new Chart(document.getElementById("p20m"),{type:"line",data:{labels:p20M.map(x=>x.month),
+ datasets:[
+ {label:"월간 중앙값",data:p20M.map(x=>x.value),borderColor:C.t,backgroundColor:C.t,tension:.25,pointRadius:5,pointHoverRadius:8,borderWidth:2.8},
+ {label:"월간 최고값",data:p20Max.map(x=>x.value),borderColor:C.o,backgroundColor:C.o,tension:.15,pointRadius:4,pointHoverRadius:7,borderWidth:2,borderDash:[5,5]}
+]},
+ options:{...base,scales:{...base.scales,y:{min:70,max:140,ticks:{color:"#9aa9ba",stepSize:10},grid:{color:"#202b38"}}},
+ plugins:{...base.plugins,tooltip:{callbacks:{afterLabel:ctx=>"세션 "+p20M[ctx.dataIndex].n+"회"}}}}});
+
+new Chart(document.getElementById("np"),{type:"line",data:{labels:R90.map(x=>x.d),
+ datasets:[lineDataset(R90,"np","I",C.i,"실내"),lineDataset(R90,"np","O",C.o,"실외"),regressionTrend(R90,"np",C.t)]},
+ options:{...base,onClick:chartClickHandler(R90),scales:{...base.scales,y:{min:75,max:135,ticks:{color:"#9aa9ba",stepSize:10},grid:{color:"#202b38"}}}}});
+
+new Chart(document.getElementById("npm"),{type:"line",data:{labels:npM.map(x=>x.month),
+ datasets:[
+ {label:"월간 중앙값",data:npM.map(x=>x.value),borderColor:C.t,backgroundColor:C.t,tension:.25,pointRadius:5,pointHoverRadius:8,borderWidth:2.8},
+ {label:"월간 최고값",data:npMax.map(x=>x.value),borderColor:C.o,backgroundColor:C.o,tension:.15,pointRadius:4,pointHoverRadius:7,borderWidth:2,borderDash:[5,5]}
+]},
+ options:{...base,scales:{...base.scales,y:{min:75,max:135,ticks:{color:"#9aa9ba",stepSize:10},grid:{color:"#202b38"}}},
+ plugins:{...base.plugins,tooltip:{callbacks:{afterLabel:ctx=>"세션 "+npM[ctx.dataIndex].n+"회"}}}}});
+
+const E=S.filter(x=>x.env==="I"&&x.p!=null&&x.hr!=null&&x.hr<=155&&x.dur>=0.75);
+const effOpt={...base,scales:{
+ x:{min:135,max:160,ticks:{color:"#9aa9ba",stepSize:5},grid:{color:"#202b38"},title:{display:true,text:"평균 심박 (bpm)",color:"#9aa9ba"}},
+ y:{min:70,max:110,ticks:{color:"#9aa9ba",stepSize:10},grid:{color:"#202b38"},title:{display:true,text:"평균 Power (W)",color:"#9aa9ba"}}
+}};
+new Chart(document.getElementById("eff"),{type:"scatter",data:{
+ datasets:[{label:"실내 세션",data:E.map(x=>({x:x.hr,y:x.p,date:x.date,eff:x.eff})),backgroundColor:C.i,borderColor:C.i,
+ pointRadius:5,pointHoverRadius:8}]
+},options:{...effOpt,plugins:{...base.plugins,tooltip:{callbacks:{
+ label:ctx=>{const r=E[ctx.dataIndex];return r?("HR "+r.hr+" bpm · Power "+r.p+" W · "+r.d):""},
+ afterLabel:ctx=>{const r=E[ctx.dataIndex];return r&&r.eff!=null?"HR 145–155 효율값 "+r.eff+" W":""
+}}}}});
+
+const Z=S.filter(x=>x.dec!=null);
+new Chart(document.getElementById("dec"),{type:"line",data:{labels:Z.map(x=>x.d),
+ datasets:[{label:"Decoupling",data:Z.map(x=>x.dec),borderColor:C.i,backgroundColor:C.i,tension:.25,
+ pointRadius:4,pointHoverRadius:7,borderWidth:2.8},regressionTrend(Z,"dec",C.t)]},options:{...base,onClick:chartClickHandler(Z)}});
+
+new Chart(document.getElementById("grade"),{type:"bar",data:{labels:D.grades.map(x=>x.grade),
+ datasets:[{label:"W/kg",data:D.grades.map(x=>x.wkg),backgroundColor:C.o,borderColor:C.o,borderWidth:1,
+ barPercentage:.9,categoryPercentage:.9,maxBarThickness:72}]},
+ options:{...base,layout:{padding:{right:24,left:4}},scales:{...base.scales,
+ x:{...base.scales.x,offset:true},
+ y:{...base.scales.y,beginAtZero:false}},
+ plugins:{...base.plugins,tooltip:{callbacks:{afterLabel:ctx=>{const g=D.grades[ctx.dataIndex];
+ return "Power "+g.power+"W · HR "+g.hr+" · n="+g.n;}}}}}});
+
+const p20Rows=S.filter(x=>x.p20!=null); const best=p20Rows.length?p20Rows.reduce((a,b)=>a.p20>b.p20?a:b):null;
+const ee=E;
+document.getElementById("best20").textContent=best?best.p20:"—";
+document.getElementById("firstEff").textContent=ee.length?ee[0].eff:"—";
+document.getElementById("lastEff").textContent=ee.length?ee[ee.length-1].eff:"—";
+const z=S.find(x=>x.date==="2026-09-20");
+document.getElementById("z2").textContent=z?(z.p+"W / HR "+z.hr+" / NP "+z.np+" / decoupling "+z.dec+"%"):"—";
+const band=S.filter(x=>x.p!=null&&x.p>=80&&x.p<=100);
+const im=band.filter(x=>x.env==="I").map(x=>x.hr).sort((a,b)=>a-b),om=band.filter(x=>x.env==="O").map(x=>x.hr).sort((a,b)=>a-b);
+const med=a=>a.length?a[Math.floor(a.length/2)]:null;
+const gap=(med(om)!=null&&med(im)!=null)?med(om)-med(im):null;
+document.getElementById("gap").textContent=gap==null?"—":gap;
+const weekMap={};
+S.forEach(x=>{
+ const d=new Date(x.date+"T00:00:00"); const day=(d.getDay()+6)%7; d.setDate(d.getDate()-day);
+ const key=d.toISOString().slice(0,10);
+ if(!weekMap[key])weekMap[key]={n:0,h:0,dist:0,tss:0,p:[],hr:[]};
+ const w=weekMap[key]; w.n++; w.h+=Number(x.dur)||0; w.dist+=Number(x.dist)||0;
+ if(x.tss!=null)w.tss+=Number(x.tss); if(x.p!=null)w.p.push(Number(x.p)); if(x.hr!=null)w.hr.push(Number(x.hr));
+});
+const avg=a=>a.length?a.reduce((x,y)=>x+y,0)/a.length:null;
+document.getElementById("weeklyTbl").innerHTML=Object.keys(weekMap).sort().reverse().map(k=>{
+ const w=weekMap[k]; return "<tr><td>"+k+"</td><td>"+w.n+"</td><td>"+w.h.toFixed(1)+"h</td><td>"+w.dist.toFixed(1)+"</td><td>"+w.tss.toFixed(1)+"</td><td>"+(avg(w.p)?.toFixed(1)??"—")+"</td><td>"+(avg(w.hr)?.toFixed(1)??"—")+"</td></tr>";
+}).join("");
+document.getElementById("tbl").innerHTML=S.slice().reverse().map(x=>
+ "<tr data-date=\""+x.date+"\"><td>"+x.d+"</td><td>"+(x.env==="I"?"실내":"실외")+"</td><td>"+x.title+"</td><td>"+x.dur.toFixed(1)+"h</td><td>"+x.dist.toFixed(1)+"</td><td>"+(x.hr??"—")+"</td><td>"+(x.p??"—")+"</td><td>"+(x.np??"—")+"</td><td>"+(x.p20??"—")+"</td><td>"+(x.tss??"—")+"</td><td>"+(x.dec!=null?x.dec.toFixed(2)+"%":"—")+"</td></tr>"
+).join("");
+</script></main></body></html>
