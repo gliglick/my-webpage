@@ -156,18 +156,24 @@ new Chart(document.getElementById("npm"),{type:"line",data:{labels:npM.map(x=>x.
  options:{...base,scales:{...base.scales,y:{min:75,max:135,ticks:{color:"#9aa9ba",stepSize:10},grid:{color:"#202b38"}}},
  plugins:{...base.plugins,tooltip:{callbacks:{afterLabel:ctx=>"세션 "+npM[ctx.dataIndex].n+"회"}}}}});
 
-const E=S.filter(x=>x.env==="I"&&x.p!=null&&x.hr!=null&&x.hr<=155&&x.dur>=0.75);
+const E=S.filter(x=>x.p!=null&&x.hr!=null&&x.dur>=0.75);
+const EI=E.filter(x=>x.env==="I"), EO=E.filter(x=>x.env==="O");
 const effOpt={...base,scales:{
- x:{min:135,max:160,ticks:{color:"#9aa9ba",stepSize:5},grid:{color:"#202b38"},title:{display:true,text:"평균 심박 (bpm)",color:"#9aa9ba"}},
- y:{min:70,max:110,ticks:{color:"#9aa9ba",stepSize:10},grid:{color:"#202b38"},title:{display:true,text:"평균 Power (W)",color:"#9aa9ba"}}
+ x:{min:135,max:180,ticks:{color:"#9aa9ba",stepSize:5},grid:{color:"#202b38"},title:{display:true,text:"평균 심박 (bpm)",color:"#9aa9ba"}},
+ y:{min:70,max:130,ticks:{color:"#9aa9ba",stepSize:10},grid:{color:"#202b38"},title:{display:true,text:"평균 Power (W)",color:"#9aa9ba"}}
 }};
 new Chart(document.getElementById("eff"),{type:"scatter",data:{
- datasets:[{label:"실내 세션",data:E.map(x=>({x:x.hr,y:x.p,date:x.date,eff:x.eff})),backgroundColor:C.i,borderColor:C.i,
- pointRadius:5,pointHoverRadius:8}]
-},options:{...effOpt,plugins:{...base.plugins,tooltip:{callbacks:{
- label:ctx=>{const r=E[ctx.dataIndex];return r?("HR "+r.hr+" bpm · Power "+r.p+" W · "+r.d):""},
- afterLabel:ctx=>{const r=E[ctx.dataIndex];return r&&r.eff!=null?"HR 145–155 효율값 "+r.eff+" W":"";}
-}}}}});
+ datasets:[
+ {label:"실내",data:EI.map(x=>({x:x.hr,y:x.p,date:x.date,eff:x.eff})),backgroundColor:C.i,borderColor:C.i,pointRadius:5,pointHoverRadius:8},
+ {label:"실외",data:EO.map(x=>({x:x.hr,y:x.p,date:x.date,eff:x.eff})),backgroundColor:C.o,borderColor:C.o,pointRadius:5,pointHoverRadius:8}
+ ]},
+ options:{...effOpt,plugins:{...base.plugins,tooltip:{callbacks:{
+ label:ctx=>{const r=(ctx.dataset.label==="실내"?EI:EO)[ctx.dataIndex];return r?ctx.dataset.label+" · HR "+r.hr+" bpm · Power "+r.p+" W · "+r.d:"";},
+ afterLabel:ctx=>{const r=(ctx.dataset.label==="실내"?EI:EO)[ctx.dataIndex];return r&&r.eff!=null?"효율값 "+r.eff+" W":"Zone2 기준 145–155 bpm";}}
+ }},onClick:function(event,elements){
+   if(!elements.length)return;
+   const el=elements[0], rows=el.datasetIndex===0?EI:EO, row=rows[el.index]; if(row)bindRowClick(el,row);
+ }}});
 
 const Z=S.filter(x=>x.dec!=null);
 new Chart(document.getElementById("dec"),{type:"line",data:{labels:Z.map(x=>x.d),
