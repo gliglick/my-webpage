@@ -83,8 +83,8 @@ const D={"sessions":[{"d":"06-03","date":"2026-06-03","env":"I","title":"실내 
 const S=D.sessions.slice().sort((a,b)=>a.date.localeCompare(b.date));
 const C={i:"#12e7f5",o:"#ff2f7f",t:"#a855f7"};
 
-function lineDataset(key,env,color,label){
-  return {label,data:S.map(x=>x.env===env&&x[key]!=null?x[key]:null),
+function lineDataset(rows,key,env,color,label){
+  return {label,data:rows.map(x=>x.env===env&&x[key]!=null?x[key]:null),
     borderColor:color,backgroundColor:color,spanGaps:true,tension:.25,borderWidth:2.5,
     pointRadius:4,pointHoverRadius:7};
 }
@@ -122,7 +122,7 @@ const p20M=monthlyMedian(S,"p20");
 const npM=monthlyMedian(S,"np");
 
 new Chart(document.getElementById("p20"),{type:"line",data:{labels:R90.map(x=>x.d),
- datasets:[lineDataset("p20","I",C.i,"실내"),lineDataset("p20","O",C.o,"실외"),regressionTrend(R90,"p20",C.t)]},
+ datasets:[lineDataset(R90,"p20","I",C.i,"실내"),lineDataset(R90,"p20","O",C.o,"실외"),regressionTrend(R90,"p20",C.t)]},
  options:{...base,onClick:chartClickHandler(R90),scales:{...base.scales,y:{min:70,max:140,ticks:{color:"#9aa9ba",stepSize:10},grid:{color:"#202b38"}}}}});
 
 new Chart(document.getElementById("p20m"),{type:"line",data:{labels:p20M.map(x=>x.month),
@@ -131,7 +131,7 @@ new Chart(document.getElementById("p20m"),{type:"line",data:{labels:p20M.map(x=>
  plugins:{...base.plugins,tooltip:{callbacks:{afterLabel:ctx=>"세션 "+p20M[ctx.dataIndex].n+"회"}}}}});
 
 new Chart(document.getElementById("np"),{type:"line",data:{labels:R90.map(x=>x.d),
- datasets:[lineDataset("np","I",C.i,"실내"),lineDataset("np","O",C.o,"실외"),regressionTrend(R90,"np",C.t)]},
+ datasets:[lineDataset(R90,"np","I",C.i,"실내"),lineDataset(R90,"np","O",C.o,"실외"),regressionTrend(R90,"np",C.t)]},
  options:{...base,onClick:chartClickHandler(R90),scales:{...base.scales,y:{min:75,max:135,ticks:{color:"#9aa9ba",stepSize:10},grid:{color:"#202b38"}}}}});
 
 new Chart(document.getElementById("npm"),{type:"line",data:{labels:npM.map(x=>x.month),
