@@ -13,23 +13,23 @@ main{max-width:1180px;margin:auto;padding:22px 14px 56px}h1{margin:0;font-size:2
 table{width:100%;border-collapse:collapse;font-size:12px}th,td{padding:8px;border-bottom:1px solid #202a35;white-space:nowrap;text-align:right}th:first-child,td:first-child{text-align:left}th{color:#91a0b2}
 .readout p{margin:7px 0}.good{color:#19d3a2}.muted{color:#91a0b2}
 @media(max-width:760px){.grid{grid-template-columns:1fr}.chartbox{height:280px}h1{font-size:24px}}
-</style></head><body><main>
+</style><style>.insight{margin-top:10px;padding:11px 13px;background:#0e151e;border:1px solid #293544;border-radius:10px;color:#b7c4d3;font-size:12px;line-height:1.65}.insight b:first-child{color:#edf4fb}</style></head><body><main>
 <h1>Cycle Performance Lab</h1><div class="sub">2026.06.03–2026.09.21 · 32 FIT · 31 논리 세션 · FTP 133 W</div>
 
 <div class="grid">
-<div class="card"><h2>20분 최고 Power</h2><div class="sub">실내 CYAN · 실외 MAGENTA · 장기 추세 PURPLE(선형회귀)</div><div class="chartbox"><canvas id="p20"></canvas></div>
+<div class="card"><h2>20분 최고 Power</h2><div class="sub">실내 CYAN · 실외 MAGENTA · 장기 추세 PURPLE(선형회귀)</div><div class="chartbox"><canvas id="p20"></canvas></div><div class="insight"><b>인사이트</b><br>장기적으로 20분 Power의 기준선은 완만한 상승 추세입니다.<br>세션별 변동폭이 커서 단일 기록보다 최근 고점의 유지 여부를 보는 것이 중요하며, 현재 최고치는 <b>119W</b>입니다.</div>
 <div class="legend"><span><i class="dot c"></i>실내</span><span><i class="dot p"></i>실외</span><span><i class="dot u"></i>장기 추세</span></div></div>
-<div class="card"><h2>Normalized Power</h2><div class="sub">Power가 기록된 세션의 NP 추세</div><div class="chartbox"><canvas id="np"></canvas></div>
+<div class="card"><h2>Normalized Power</h2><div class="sub">Power가 기록된 세션의 NP 추세</div><div class="chartbox"><canvas id="np"></canvas></div><div class="insight"><b>인사이트</b><br>NP 역시 장기적으로 상승하는 흐름이며, 최근에는 110W 이상 세션이 반복되고 있습니다.<br>다만 NP는 운동 강도와 인터벌 구성의 영향을 받으므로 체력 향상과 훈련 강도를 함께 해석해야 합니다.</div>
 <div class="legend"><span><i class="dot c"></i>실내</span><span><i class="dot p"></i>실외</span><span><i class="dot u"></i>장기 추세</span></div></div>
 </div>
 
 <div class="grid">
-<div class="card"><h2>같은 심박에서 낼 수 있는 Power</h2><div class="sub">HR 145–155 bpm · 실내 · 평균 HR ≤155 · 45분 이상</div><div class="chartbox"><canvas id="eff"></canvas></div></div>
-<div class="card"><h2>장시간 Aerobic Decoupling</h2><div class="sub">실내 Z2 유사 세션 · 0%에 가까울수록 후반 효율 저하가 작음</div><div class="chartbox"><canvas id="dec"></canvas></div></div>
+<div class="card"><h2>같은 심박에서 낼 수 있는 Power</h2><div class="sub">HR 145–155 bpm · 실내 · 평균 HR ≤155 · 45분 이상</div><div class="chartbox"><canvas id="eff"></canvas></div><div class="insight"><b>인사이트</b><br>HR 145–155에서 낼 수 있는 Power가 초기 약 <b>84W</b>에서 최근 <b>97W</b>까지 상승했습니다.<br>심박을 기준으로 한 유산소 효율이 개선되고 있으며, 현재 약 <b>+15%</b>의 향상이 관찰됩니다.</div></div>
+<div class="card"><h2>장시간 Aerobic Decoupling</h2><div class="sub">실내 Z2 유사 세션 · 0%에 가까울수록 후반 효율 저하가 작음</div><div class="chartbox"><canvas id="dec"></canvas></div><div class="insight"><b>인사이트</b><br>장시간 Z2 세션의 대부분은 <b>±3% 안팎</b>으로, 최근 9/17은 -1.0%, 9/20은 +0.1%로 후반 효율이 안정적입니다.<br>단일 이상치보다 90–120분 세션에서 0%에 가까운 상태가 반복되는지를 보는 것이 중요합니다.</div></div>
 </div>
 
 <div class="grid">
-<div class="card"><h2>실외 등반 퍼포먼스</h2><div class="sub">경사별 median W/kg · 막대에 마우스/터치하면 Power·HR·표본 표시</div><div class="chartbox"><canvas id="grade"></canvas></div></div>
+<div class="card"><h2>실외 등반 퍼포먼스</h2><div class="sub">경사별 median W/kg · 막대에 마우스/터치하면 Power·HR·표본 표시</div><div class="chartbox"><canvas id="grade"></canvas></div><div class="insight"><b>인사이트</b><br>경사가 높아질수록 Power가 증가하며, 0~2% 약 <b>1.76 W/kg</b>에서 4~6% 약 <b>2.55 W/kg</b>로 상승합니다.<br>6~8% 구간은 표본이 60개로 적어 추세 판단에는 주의가 필요합니다.</div></div>
 <div class="card"><h2>현재 사이클 퍼포먼스 판독</h2><div class="readout">
 <p><b>Power:</b> 현재 최고 20분 Power는 <span id="best20"></span> W.</p>
 <p><b>Aerobic Efficiency:</b> HR 145–155에서 <span id="firstEff"></span> W → <span id="lastEff"></span> W.</p>
