@@ -35,7 +35,7 @@ h1{color:#ffffff}
 </div>
 
 <div class="grid">
-<div class="card"><h2>심박수 대비 Power (Zone2 이하)</h2><div class="sub">실내 · 45분 이상 · 평균 HR ≤155 bpm · x축 HR / y축 Power</div><div class="chartbox"><canvas id="eff"></canvas></div><div class="insight"><b>인사이트</b><br>같은 심박에서 더 높은 Power가 오른쪽 위가 아닌 <b>위쪽으로 이동</b>하는 것이 유산소 효율 개선입니다.<br>특히 HR 145–155 구간의 Power 수준을 함께 보면 장기적인 유산소 엔진 변화를 확인하기 쉽습니다.</div></div>
+<div class="card"><h2>심박수 대비 Power (Zone2 이하)</h2><div class="sub">날짜별 효율 추이 · 실내 CYAN · 실외 MAGENTA · 장기 추세 PURPLE</div><div class="chartbox"><canvas id="eff"></canvas></div><div class="insight"><b>인사이트</b><br>같은 심박에서 낼 수 있는 Power를 날짜별로 연결해 유산소 효율의 <b>추이</b>를 봅니다.<br>특히 HR 145–155 구간의 효율값 변화를 중심으로 장기적인 유산소 엔진 변화를 확인합니다.</div></div>
 <div class="card"><h2>장시간 Aerobic Decoupling</h2><div class="sub">실내 Z2 유사 세션 · 0%에 가까울수록 후반 효율 저하가 작음</div><div class="chartbox"><canvas id="dec"></canvas></div><div class="insight"><b>인사이트</b><br>장시간 Z2 세션의 대부분은 <b>±3% 안팎</b>으로, 최근 9/17은 -1.0%, 9/20은 +0.1%로 후반 효율이 안정적입니다.<br>단일 이상치보다 90–120분 세션에서 0%에 가까운 상태가 반복되는지를 보는 것이 중요합니다.</div></div>
 </div>
 
@@ -156,24 +156,20 @@ new Chart(document.getElementById("npm"),{type:"line",data:{labels:npM.map(x=>x.
  options:{...base,scales:{...base.scales,y:{min:75,max:135,ticks:{color:"#9aa9ba",stepSize:10},grid:{color:"#202b38"}}},
  plugins:{...base.plugins,tooltip:{callbacks:{afterLabel:ctx=>"세션 "+npM[ctx.dataIndex].n+"회"}}}}});
 
-const E=S.filter(x=>x.p!=null&&x.hr!=null&&x.dur>=0.75);
+const E=S.filter(x=>x.eff!=null&&x.dur>=0.75);
 const EI=E.filter(x=>x.env==="I"), EO=E.filter(x=>x.env==="O");
 const effOpt={...base,scales:{
- x:{min:135,max:180,ticks:{color:"#9aa9ba",stepSize:5},grid:{color:"#202b38"},title:{display:true,text:"평균 심박 (bpm)",color:"#9aa9ba"}},
- y:{min:70,max:130,ticks:{color:"#9aa9ba",stepSize:10},grid:{color:"#202b38"},title:{display:true,text:"평균 Power (W)",color:"#9aa9ba"}}
+ x:{ticks:{color:"#9aa9ba",maxRotation:45,minRotation:0},grid:{color:"#202b38"}},
+ y:{min:70,max:110,ticks:{color:"#9aa9ba",stepSize:10},grid:{color:"#202b38"}}
 }};
-new Chart(document.getElementById("eff"),{type:"scatter",data:{
+new Chart(document.getElementById("eff"),{type:"line",data:{labels:E.map(x=>x.d),
  datasets:[
- {label:"실내",data:EI.map(x=>({x:x.hr,y:x.p,date:x.date,eff:x.eff})),backgroundColor:C.i,borderColor:C.i,pointRadius:5,pointHoverRadius:8},
- {label:"실외",data:EO.map(x=>({x:x.hr,y:x.p,date:x.date,eff:x.eff})),backgroundColor:C.o,borderColor:C.o,pointRadius:5,pointHoverRadius:8}
- ]},
- options:{...effOpt,plugins:{...base.plugins,tooltip:{callbacks:{
- label:ctx=>{const r=(ctx.dataset.label==="실내"?EI:EO)[ctx.dataIndex];return r?ctx.dataset.label+" · HR "+r.hr+" bpm · Power "+r.p+" W · "+r.d:"";},
- afterLabel:ctx=>{const r=(ctx.dataset.label==="실내"?EI:EO)[ctx.dataIndex];return r&&r.eff!=null?"효율값 "+r.eff+" W":"Zone2 기준 145–155 bpm";}}
- }},onClick:function(event,elements){
-   if(!elements.length)return;
-   const el=elements[0], rows=el.datasetIndex===0?EI:EO, row=rows[el.index]; if(row)bindRowClick(el,row);
- }}});
+ {label:"실내",data:E.map(x=>x.env==="I"?x.eff:null),borderColor:C.i,backgroundColor:C.i,spanGaps:true,tension:.25,pointRadius:4,pointHoverRadius:7,borderWidth:2.8},
+ {label:"실외",data:E.map(x=>x.env==="O"?x.eff:null),borderColor:C.o,backgroundColor:C.o,spanGaps:true,tension:.25,pointRadius:4,pointHoverRadius:7,borderWidth:2.8},
+ regressionTrend(E,"eff",C.t)
+]},options:{...effOpt,onClick:chartClickHandler(E),plugins:{...base.plugins,tooltip:{callbacks:{
+ label:ctx=>{const r=E[ctx.dataIndex];return r?ctx.dataset.label+" · HR "+r.hr+" bpm · Power "+r.p+" W · "+r.d:"";}
+}}}}});
 
 const Z=S.filter(x=>x.dec!=null);
 new Chart(document.getElementById("dec"),{type:"line",data:{labels:Z.map(x=>x.d),
