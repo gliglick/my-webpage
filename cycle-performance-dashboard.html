@@ -26,16 +26,16 @@ h1{color:#ffffff}
 <div class="grid">
 <div class="card"><h2>20분 최고 Power — 최근 90일</h2><div class="sub">개별 라이딩 · 실내 CYAN · 실외 MAGENTA · 장기 추세 PURPLE</div><div class="chartbox"><canvas id="p20"></canvas></div><div class="insight"><b>인사이트</b><br>최근 90일의 20분 Power를 개별 세션으로 표시합니다. 단기적인 고점과 변동을 확인하면서 장기 추세도 함께 봅니다.<br>현재 최고 20분 Power는 <b>125W</b>입니다.</div>
 <div class="legend"><span><i class="dot c"></i>실내</span><span><i class="dot p"></i>실외</span><span><i class="dot u"></i>90일 추세</span></div></div>
-<div class="card"><h2>20분 최고 Power — 월간 중앙값 + 최고값</h2><div class="sub">월별 중앙값 + 월간 최고값 · 중앙값은 기준선, 최고값은 고점 확인</div><div class="chartbox"><canvas id="p20m"></canvas></div><div class="insight"><b>인사이트</b><br>중앙값은 해당 월의 대표적인 체력 수준을, 최고값은 그 달에 실제로 도달한 고점을 보여줍니다.<br>두 값을 함께 보면 <b>평균적인 수준과 고점의 간격</b>을 동시에 확인할 수 있습니다.</div></div>
+<div class="card"><h2>20분 최고 Power — 월간 중앙값 + 최고값</h2><div class="sub">월별 중앙값 + 월간 최고값 · 대표 수준과 고점 확인</div><div class="chartbox"><canvas id="p20m"></canvas></div><div class="insight"><b>인사이트</b><br>월간 중앙값은 특정 고강도 세션 하나에 의해 월간 기준선이 과도하게 움직이는 것을 막아줍니다. 월별 체력 수준의 변화를 보는 용도입니다.</div></div>
 </div>
 <div class="grid">
 <div class="card"><h2>Normalized Power — 최근 90일</h2><div class="sub">개별 라이딩 · 실내 CYAN · 실외 MAGENTA · 장기 추세 PURPLE</div><div class="chartbox"><canvas id="np"></canvas></div><div class="insight"><b>인사이트</b><br>최근 90일 NP를 개별 세션으로 표시합니다. 인터벌이나 고강도 세션의 영향까지 포함한 실제 훈련 강도 변화를 확인할 수 있습니다.</div>
 <div class="legend"><span><i class="dot c"></i>실내</span><span><i class="dot p"></i>실외</span><span><i class="dot u"></i>90일 추세</span></div></div>
-<div class="card"><h2>Normalized Power — 월간 중앙값 + 최고값</h2><div class="sub">월별 중앙값 + 월간 최고값 · 훈련 강도의 대표 수준과 고점</div><div class="chartbox"><canvas id="npm"></canvas></div><div class="insight"><b>인사이트</b><br>NP의 월간 중앙값은 대표적인 훈련 강도를, 최고값은 해당 월의 가장 강한 세션 수준을 보여줍니다.</div></div>
+<div class="card"><h2>Normalized Power — 월간 중앙값 + 최고값</h2><div class="sub">월별 중앙값 + 월간 최고값 · 대표 수준과 고점 확인</div><div class="chartbox"><canvas id="npm"></canvas></div><div class="insight"><b>인사이트</b><br>월간 중앙값은 운동 종류와 세션별 강도 차이가 큰 환경에서 NP의 대표적인 월간 수준을 보기 적합합니다.</div></div>
 </div>
 
 <div class="grid">
-<div class="card"><h2>심박수 대비 Power (Zone2 이하)</h2><div class="sub">실내 · 45분 이상 · 평균 HR ≤155 bpm · x축 HR / y축 Power</div><div class="chartbox"><canvas id="eff"></canvas></div><div class="insight"><b>인사이트</b><br>같은 심박에서 더 높은 Power가 오른쪽 위가 아닌 <b>위쪽으로 이동</b>하는 것이 유산소 효율 개선입니다.<br>특히 HR 145–155 구간의 Power 수준을 함께 보면 장기적인 유산소 엔진 변화를 확인하기 쉽습니다.</div></div>
+<div class="card"><h2>심박수 대비 Power (Zone2 이하)</h2><div class="sub">HR 145–155 bpm · 실내 · 평균 HR ≤155 · 45분 이상</div><div class="chartbox"><canvas id="eff"></canvas></div><div class="insight"><b>인사이트</b><br>HR 145–155에서 낼 수 있는 Power가 초기 약 <b>84W</b>에서 최근 <b>97W</b>까지 상승했습니다.<br>심박을 기준으로 한 유산소 효율이 개선되고 있으며, 현재 약 <b>+15%</b>의 향상이 관찰됩니다.</div></div>
 <div class="card"><h2>장시간 Aerobic Decoupling</h2><div class="sub">실내 Z2 유사 세션 · 0%에 가까울수록 후반 효율 저하가 작음</div><div class="chartbox"><canvas id="dec"></canvas></div><div class="insight"><b>인사이트</b><br>장시간 Z2 세션의 대부분은 <b>±3% 안팎</b>으로, 최근 9/17은 -1.0%, 9/20은 +0.1%로 후반 효율이 안정적입니다.<br>단일 이상치보다 90–120분 세션에서 0%에 가까운 상태가 반복되는지를 보는 것이 중요합니다.</div></div>
 </div>
 
@@ -156,18 +156,12 @@ new Chart(document.getElementById("npm"),{type:"line",data:{labels:npM.map(x=>x.
  options:{...base,scales:{...base.scales,y:{min:75,max:135,ticks:{color:"#9aa9ba",stepSize:10},grid:{color:"#202b38"}}},
  plugins:{...base.plugins,tooltip:{callbacks:{afterLabel:ctx=>"세션 "+npM[ctx.dataIndex].n+"회"}}}}});
 
-const E=S.filter(x=>x.env==="I"&&x.p!=null&&x.hr!=null&&x.hr<=155&&x.dur>=0.75);
-const effOpt={...base,scales:{
- x:{min:135,max:160,ticks:{color:"#9aa9ba",stepSize:5},grid:{color:"#202b38"},title:{display:true,text:"평균 심박 (bpm)",color:"#9aa9ba"}},
- y:{min:70,max:110,ticks:{color:"#9aa9ba",stepSize:10},grid:{color:"#202b38"},title:{display:true,text:"평균 Power (W)",color:"#9aa9ba"}}
-}};
-new Chart(document.getElementById("eff"),{type:"scatter",data:{
- datasets:[{label:"실내 세션",data:E.map(x=>({x:x.hr,y:x.p,date:x.date,eff:x.eff})),backgroundColor:C.i,borderColor:C.i,
- pointRadius:5,pointHoverRadius:8}]
-},options:{...effOpt,plugins:{...base.plugins,tooltip:{callbacks:{
- label:ctx=>{const r=E[ctx.dataIndex];return r?("HR "+r.hr+" bpm · Power "+r.p+" W · "+r.d):""},
- afterLabel:ctx=>{const r=E[ctx.dataIndex];return r&&r.eff!=null?"HR 145–155 효율값 "+r.eff+" W":""
-}}}}});
+const E=S.filter(x=>x.eff!=null&&x.env==="I"&&x.hr<=155&&x.dur>=0.75);
+const effOpt={...base,scales:{x:{ticks:{color:"#9aa9ba",maxRotation:45},grid:{color:"#202b38"}},
+ y:{min:70,ticks:{color:"#9aa9ba"},grid:{color:"#202b38"}}}};
+new Chart(document.getElementById("eff"),{type:"line",data:{labels:E.map(x=>x.d),
+ datasets:[{label:"Power @ HR 145–155",data:E.map(x=>x.eff),borderColor:C.i,backgroundColor:C.i,
+ tension:.25,pointRadius:4,pointHoverRadius:7,borderWidth:2.8},regressionTrend(E,"eff",C.t)]},options:{...effOpt,onClick:chartClickHandler(E)}});
 
 const Z=S.filter(x=>x.dec!=null);
 new Chart(document.getElementById("dec"),{type:"line",data:{labels:Z.map(x=>x.d),
