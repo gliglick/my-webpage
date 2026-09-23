@@ -97,7 +97,7 @@ new Chart(document.getElementById("grade"),{type:"bar",data:{labels:D.grades.map
  options:{...base,plugins:{...base.plugins,tooltip:{callbacks:{afterLabel:ctx=>{const g=D.grades[ctx.dataIndex];
  return "Power "+g.power+"W · HR "+g.hr+" · n="+g.n;}}}}}});
 
-const best=S.filter(x=>x.p20!=null).reduce((a,b)=>a.p20>b.p20?a:b,null);
+const p20Rows=S.filter(x=>x.p20!=null); const best=p20Rows.length?p20Rows.reduce((a,b)=>a.p20>b.p20?a:b):null;
 const ee=E;
 document.getElementById("best20").textContent=best?best.p20:"—";
 document.getElementById("firstEff").textContent=ee.length?ee[0].eff:"—";
