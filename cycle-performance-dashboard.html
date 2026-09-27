@@ -25,7 +25,7 @@ h1{color:#ffffff}
 
 <div class="card" style="margin-top:14px"><h2>FIT 파일 추가</h2><div class="sub">Garmin FIT 파일을 선택해 대시보드에 추가합니다.</div><input id="fitFile" type="file" accept=".fit" style="margin-top:12px"><button id="fitUploadButton" type="button" style="margin-left:10px;background:#f2c94c;color:#111827;border:0;border-radius:8px;padding:10px 16px;font-weight:800;cursor:pointer">FIT 업로드</button><span id="fitUploadStatus" role="status" style="margin-left:10px;color:#aab8c9"></span></div>
 <div class="grid">
-<div class="card"><h2>20분 최고 Power — 최근 90일</h2><div class="sub">개별 라이딩 · 실내 CYAN · 실외 MAGENTA · 장기 추세 PURPLE</div><div class="chartbox"><canvas id="p20"></canvas></div><div class="insight"><b>인사이트</b><br>최근 90일의 20분 Power를 개별 세션으로 표시합니다. 단기적인 고점과 변동을 확인하면서 장기 추세도 함께 봅니다.<br>현재 최고 20분 Power는 <b>125W</b>입니다.</div>
+<div class="card"><h2>20분 최고 Power — 최근 90일</h2><div class="sub">개별 라이딩 · 실내 CYAN · 실외 MAGENTA · 장기 추세 PURPLE</div><div class="chartbox"><canvas id="p20"></canvas></div><div class="insight"><b>인사이트</b><br>최근 90일의 20분 Power를 개별 세션으로 표시합니다. 단기적인 고점과 변동을 확인하면서 장기 추세도 함께 봅니다.<br>현재 최고 20분 Power는 <b><span id="best20Insight">—</span>W</b>입니다.</div>
 <div class="legend"><span><i class="dot c"></i>실내</span><span><i class="dot p"></i>실외</span><span><i class="dot u"></i>90일 추세</span></div></div>
 <div class="card"><h2>20분 최고 Power — 월간 중앙값 + 최고값</h2><div class="sub">월별 중앙값 + 월간 최고값 · 중앙값은 기준선, 최고값은 고점 확인</div><div class="chartbox"><canvas id="p20m"></canvas></div><div class="insight"><b>인사이트</b><br>중앙값은 해당 월의 대표적인 체력 수준을, 최고값은 그 달에 실제로 도달한 고점을 보여줍니다.<br>두 값을 함께 보면 <b>평균적인 수준과 고점의 간격</b>을 동시에 확인할 수 있습니다.</div></div>
 </div>
@@ -203,6 +203,7 @@ new Chart(document.getElementById("grade"),{type:"bar",data:{labels:D.grades.map
 const p20Rows=S.filter(x=>x.p20!=null); const best=p20Rows.length?p20Rows.reduce((a,b)=>a.p20>b.p20?a:b):null;
 const ee=E;
 document.getElementById("best20").textContent=best?best.p20:"—";
+document.getElementById("best20Insight").textContent=best?best.p20:"—";
 document.getElementById("firstEff").textContent=ee.length?ee[0].p:"—";
 document.getElementById("lastEff").textContent=ee.length?ee[ee.length-1].p:"—";
 const z=S.find(x=>x.date==="2026-09-20");
