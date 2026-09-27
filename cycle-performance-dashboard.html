@@ -25,23 +25,23 @@ h1{color:#ffffff}
 
 <div class="card" style="margin-top:14px"><h2>FIT 파일 추가</h2><div class="sub">Garmin FIT 파일을 선택해 대시보드에 추가합니다.</div><input id="fitFile" type="file" accept=".fit" style="margin-top:12px"><button id="fitUploadButton" type="button" style="margin-left:10px;background:#f2c94c;color:#111827;border:0;border-radius:8px;padding:10px 16px;font-weight:800;cursor:pointer">FIT 업로드</button><span id="fitUploadStatus" role="status" style="margin-left:10px;color:#aab8c9"></span></div>
 <div class="grid">
-<div class="card"><h2>20분 최고 Power — 최근 90일</h2><div class="sub">개별 라이딩 · 실내 CYAN · 실외 MAGENTA · 장기 추세 PURPLE</div><div class="chartbox"><canvas id="p20"></canvas></div><div class="insight"><b>인사이트</b><br>최근 90일의 20분 Power를 개별 세션으로 표시합니다. 단기적인 고점과 변동을 확인하면서 장기 추세도 함께 봅니다.<br>현재 최고 20분 Power는 <b><span id="best20Insight">—</span>W</b>입니다.<br>최근 라이딩: <b><span id="latestRideInsight">—</span></b></div>
+<div class="card"><h2>20분 최고 Power — 최근 90일</h2><div class="sub">개별 라이딩 · 실내 CYAN · 실외 MAGENTA · 장기 추세 PURPLE</div><div class="chartbox"><canvas id="p20"></canvas></div><div class="insight" id="insightP20"><b>추세 분석</b><br>최근 데이터 분석 중…</div>
 <div class="legend"><span><i class="dot c"></i>실내</span><span><i class="dot p"></i>실외</span><span><i class="dot u"></i>90일 추세</span></div></div>
-<div class="card"><h2>20분 최고 Power — 월간 중앙값 + 최고값</h2><div class="sub">월별 중앙값 + 월간 최고값 · 중앙값은 기준선, 최고값은 고점 확인</div><div class="chartbox"><canvas id="p20m"></canvas></div><div class="insight"><b>인사이트</b><br>중앙값은 해당 월의 대표적인 체력 수준을, 최고값은 그 달에 실제로 도달한 고점을 보여줍니다.<br>두 값을 함께 보면 <b>평균적인 수준과 고점의 간격</b>을 동시에 확인할 수 있습니다.</div></div>
+<div class="card"><h2>20분 최고 Power — 월간 중앙값 + 최고값</h2><div class="sub">월별 중앙값 + 월간 최고값 · 중앙값은 기준선, 최고값은 고점 확인</div><div class="chartbox"><canvas id="p20m"></canvas></div><div class="insight" id="insightP20M"><b>월간 추세</b><br>최근 데이터 분석 중…</div></div>
 </div>
 <div class="grid">
-<div class="card"><h2>Normalized Power — 최근 90일</h2><div class="sub">개별 라이딩 · 실내 CYAN · 실외 MAGENTA · 장기 추세 PURPLE</div><div class="chartbox"><canvas id="np"></canvas></div><div class="insight"><b>인사이트</b><br>최근 90일 NP를 개별 세션으로 표시합니다. 인터벌이나 고강도 세션의 영향까지 포함한 실제 훈련 강도 변화를 확인할 수 있습니다.</div>
+<div class="card"><h2>Normalized Power — 최근 90일</h2><div class="sub">개별 라이딩 · 실내 CYAN · 실외 MAGENTA · 장기 추세 PURPLE</div><div class="chartbox"><canvas id="np"></canvas></div><div class="insight" id="insightNP"><b>추세 분석</b><br>최근 데이터 분석 중…</div>
 <div class="legend"><span><i class="dot c"></i>실내</span><span><i class="dot p"></i>실외</span><span><i class="dot u"></i>90일 추세</span></div></div>
-<div class="card"><h2>Normalized Power — 월간 중앙값 + 최고값</h2><div class="sub">월별 중앙값 + 월간 최고값 · 훈련 강도의 대표 수준과 고점</div><div class="chartbox"><canvas id="npm"></canvas></div><div class="insight"><b>인사이트</b><br>NP의 월간 중앙값은 대표적인 훈련 강도를, 최고값은 해당 월의 가장 강한 세션 수준을 보여줍니다.</div></div>
+<div class="card"><h2>Normalized Power — 월간 중앙값 + 최고값</h2><div class="sub">월별 중앙값 + 월간 최고값 · 훈련 강도의 대표 수준과 고점</div><div class="chartbox"><canvas id="npm"></canvas></div><div class="insight" id="insightNPM"><b>월간 추세</b><br>최근 데이터 분석 중…</div></div>
 </div>
 
 <div class="grid">
-<div class="card"><h2>심박수 대비 Power 추이</h2><div class="sub">HR 140–165 bpm 세션 · 평균 Power(W) · 실내 CYAN · 실외 MAGENTA · 장기 추세 PURPLE</div><div class="chartbox"><canvas id="eff"></canvas></div><div class="insight"><b>인사이트</b><br>유산소 구간에서 비교 가능한 <b>HR 140–165 bpm</b> 세션만 추려 날짜별 평균 Power를 연결합니다.<br>Y축은 <b>실제 평균 Power(W)</b>이며, 같은 범위의 심박에서 더 높은 Power를 낼수록 유산소 출력이 좋아진 것으로 해석합니다.</div></div>
-<div class="card"><h2>장시간 Aerobic Decoupling</h2><div class="sub">실내 Z2 유사 세션 · 0%에 가까울수록 후반 효율 저하가 작음</div><div class="chartbox"><canvas id="dec"></canvas></div><div class="insight"><b>인사이트</b><br>유효한 장시간 세션 중 <b><span id="decWithin">—</span></b>이(가) ±3% 이내입니다. 가장 최근 측정은 <b><span id="decLatest">—</span></b>입니다.<br>단일 이상치보다 90–120분 세션에서 0%에 가까운 상태가 반복되는지를 보는 것이 중요합니다.</div></div>
+<div class="card"><h2>심박수 대비 Power 추이</h2><div class="sub">HR 140–165 bpm 세션 · 평균 Power(W) · 실내 CYAN · 실외 MAGENTA · 장기 추세 PURPLE</div><div class="chartbox"><canvas id="eff"></canvas></div><div class="insight" id="insightEff"><b>유산소 추세</b><br>최근 데이터 분석 중…</div></div>
+<div class="card"><h2>장시간 Aerobic Decoupling</h2><div class="sub">실내 Z2 유사 세션 · 0%에 가까울수록 후반 효율 저하가 작음</div><div class="chartbox"><canvas id="dec"></canvas></div><div class="insight" id="insightDec"><b>지속력·드리프트</b><br>최근 데이터 분석 중…</div></div>
 </div>
 
 <div class="grid">
-<div class="card"><h2>실외 등반 퍼포먼스</h2><div class="sub">경사별 median W/kg · 막대에 마우스/터치하면 Power·HR·표본 표시</div><div class="chartbox"><canvas id="grade"></canvas></div><div class="insight"><b>인사이트</b><br>경사 구간별 중앙값은 0~2%에서 <b><span id="gradeLow">—</span> W/kg</b>, 4~6%에서 <b><span id="gradeHigh">—</span> W/kg</b>입니다.<br>6~8% 구간의 표본은 <b><span id="gradeN">—</span>개</b>이므로 다른 구간과 비교할 때 표본 수를 함께 확인하세요.</div></div>
+<div class="card"><h2>실외 등반 퍼포먼스</h2><div class="sub">경사별 median W/kg · 막대에 마우스/터치하면 Power·HR·표본 표시</div><div class="chartbox"><canvas id="grade"></canvas></div><div class="insight" id="insightGrade"><b>등반 해석</b><br>현재 등반 표본의 특징과 한계를 분석합니다.</div></div>
 <div class="card"><h2>현재 사이클 퍼포먼스 판독</h2><div class="readout">
 <p><b>Power:</b> 현재 최고 20분 Power는 <span id="best20"></span> W.</p>
 <p><b>Aerobic Power:</b> HR 140–165 구간에서 <span id="firstEff"></span> W → <span id="lastEff"></span> W.</p>
@@ -208,6 +208,33 @@ const latestRide=S.length?S.reduce((a,b)=>a.date>b.date?a:b):null;
 document.getElementById("latestRideInsight").textContent=latestRide
  ? latestRide.date+" · "+(latestRide.title||"라이딩")+" · "+(latestRide.dist!=null?(latestRide.dist>=1000?(latestRide.dist/1000).toFixed(1)+"km":latestRide.dist.toFixed(1)+"m"):"거리 미상")+" · "+(latestRide.dur!=null?latestRide.dur.toFixed(2)+"시간":"시간 미상")+" · 평균 "+(latestRide.p!=null?latestRide.p+"W":"Power 미상")+" · 20분 "+(latestRide.p20!=null?latestRide.p20+"W":"계산 불가")
  : "라이딩 데이터 없음";
+
+function medVals(rows,key){const a=rows.map(x=>Number(x[key])).filter(Number.isFinite).sort((a,b)=>a-b);return a.length?(a.length%2?a[(a.length-1)/2]:(a[a.length/2-1]+a[a.length/2])/2):null;}
+function meanVals(rows,key){const a=rows.map(x=>Number(x[key])).filter(Number.isFinite);return a.length?a.reduce((s,v)=>s+v,0)/a.length:null;}
+function fmt(v,d=1){return v==null?"자료 부족":v.toFixed(d);}
+function trendCompare(rows,key,n=3){const a=rows.filter(x=>x[key]!=null);if(a.length<4)return null;const recent=a.slice(-n),prior=a.slice(-2*n,-n);if(prior.length<2||recent.length<2)return null;const r=medVals(recent,key),p=medVals(prior,key);return {r,p,delta:r-p,pct:p?100*(r-p)/p:null,recent,prior};}
+function direction(t,unit="W"){if(!t)return "비교 가능한 세션이 아직 충분하지 않습니다.";const sign=t.delta>0.5?"상승":t.delta< -0.5?"하락":"대체로 보합";return sign+" ("+(t.delta>0?"+":"")+fmt(t.delta,1)+unit+", 최근 "+t.recent.length+"회 중앙값과 직전 "+t.prior.length+"회 비교)";}
+const t20=trendCompare(S,"p20"),tnp=trendCompare(S,"np");
+const tEff=trendCompare(E,"p");
+const validDec=S.filter(x=>x.dec!=null&&x.dur>=1.5);
+const tDec=trendCompare(validDec,"dec");
+const p20Latest=S.filter(x=>x.p20!=null).slice(-3);
+const p20Prev=S.filter(x=>x.p20!=null).slice(-6,-3);
+const m20Last=p20M.slice(-1)[0],m20Prev=p20M.slice(-2,-1)[0];
+const mnLast=npM.slice(-1)[0],mnPrev=npM.slice(-2,-1)[0];
+const recent30=S.length?S.filter(x=>(new Date(S[S.length-1].date)-new Date(x.date))/86400000<=30):[];
+const prior30=S.length?S.filter(x=>{const d=(new Date(S[S.length-1].date)-new Date(x.date))/86400000;return d>30&&d<=60;}):[];
+const hours30=recent30.reduce((s,x)=>s+(Number(x.dur)||0),0),hoursPrev=prior30.reduce((s,x)=>s+(Number(x.dur)||0),0);
+const p20Best=S.filter(x=>x.p20!=null).reduce((a,b)=>!a||b.p20>a.p20?b:a,null);
+const lastRide=S.length?S[S.length-1]:null;
+document.getElementById("insightP20").innerHTML="<b>20분 지속 파워 추세</b><br>"+(t20?"최근 "+t20.recent.length+"회 중앙값 "+fmt(t20.r)+"W, 직전 "+t20.prior.length+"회 "+fmt(t20.p)+"W로 "+direction(t20)+".":"20분 파워 기록이 충분히 쌓이지 않아 단기 추세를 판단하기 어렵습니다.")+"<br>"+(p20Best?"기록상 최고는 "+p20Best.p20+"W ("+p20Best.date+")입니다. 최고점보다 최근 반복 가능한 수준이 올라가는지를 우선 보세요.":"20분 파워 데이터가 없습니다.");
+document.getElementById("insightP20M").innerHTML="<b>월간 체력 변화</b><br>"+(m20Last&&m20Prev?"최근 월 중앙값 "+fmt(m20Last.value)+"W ("+m20Last.n+"회), 전월 "+fmt(m20Prev.value)+"W ("+m20Prev.n+"회)로 "+(m20Last.value>m20Prev.value+0.5?"상승":m20Last.value<m20Prev.value-0.5?"하락":"보합")+"입니다.":"월별 비교 표본이 부족합니다.")+"<br>월별 세션 수가 적거나 실내·실외 구성이 달라지면 월간 차이는 체력 변화만을 뜻하지 않습니다.";
+document.getElementById("insightNP").innerHTML="<b>세션 강도 추세</b><br>"+(tnp?"최근 세션 NP 중앙값 "+fmt(tnp.r)+"W 대 직전 "+fmt(tnp.p)+"W: "+direction(tnp)+".":"NP 추세를 비교할 세션이 부족합니다.")+"<br>NP 상승이 20분 파워 상승 없이 나타나면 강도 변동은 커졌지만 지속 파워 향상으로 이어졌는지는 추가 확인이 필요합니다.";
+document.getElementById("insightNPM").innerHTML="<b>월간 부하 강도</b><br>"+(mnLast&&mnPrev?"최근 월 NP 중앙값 "+fmt(mnLast.value)+"W, 전월 "+fmt(mnPrev.value)+"W ("+(mnLast.value-mnPrev.value>0?"+":"")+fmt(mnLast.value-mnPrev.value)+"W).":"월간 NP 비교 표본이 부족합니다.")+"<br>NP는 훈련량 자체가 아닙니다. 주간 시간·빈도와 함께 봐야 하며, 높은 NP만을 목표로 올리지 마세요.";
+document.getElementById("insightEff").innerHTML="<b>심박 대비 유산소 출력</b><br>"+(tEff?"HR 140–165 bpm 범위의 최근 "+tEff.recent.length+"회 평균 Power 중앙값 "+fmt(tEff.r)+"W, 직전 "+fmt(tEff.p)+"W로 "+direction(tEff)+".":"동일 심박 범위의 비교 세션이 부족합니다.")+"<br>실내와 실외를 섞으면 기온·냉각·지형 영향이 큽니다. 가능하면 같은 환경끼리 비교하세요.";
+document.getElementById("insightDec").innerHTML="<b>장시간 지속력</b><br>"+(validDec.length?("장시간 세션 "+validDec.length+"회 중 "+validDec.filter(x=>Math.abs(x.dec)<=3).length+"회가 ±3% 이내. 최근 값 "+fmt(validDec[validDec.length-1].dec,1)+"%."):"장시간 세션의 decoupling 데이터가 없어 지속력을 판단할 수 없습니다.")+"<br>"+(tDec?(tDec.delta>1?"최근 decoupling이 커졌습니다. 다음 장시간 Z2는 파워를 낮추고 수분·냉각·초반 페이스를 점검하세요.":tDec.delta< -1?"최근 decoupling이 줄었습니다. 같은 파워·시간 조건에서도 반복되는지 확인하며 Z2 시간을 점진적으로 늘릴 수 있습니다.":"최근 비교에서는 뚜렷한 변화가 없습니다. 동일한 조건으로 추세를 더 쌓으세요."):"판단 전 동일한 조건의 장시간 세션을 더 확보하세요.");
+document.getElementById("insightGrade").innerHTML="<b>등반 지표의 해석</b><br>"+(gradeLow&&gradeHigh?"0–2% 중앙값 "+fmt(gradeLow.wkg,2)+" W/kg, 4–6% "+fmt(gradeHigh.wkg,2)+" W/kg.":"경사별 자료가 충분하지 않습니다.")+"<br>이 구간별 요약은 FIT 업로드만으로 새로 계산되지 않는 기존 표본일 수 있습니다. 표본 수가 적으면 등반 체력의 추세로 단정하지 말고, 같은 오르막의 시간·파워·심박을 누적 비교해야 합니다.";
+
 document.getElementById("dashboardSummary").textContent=(S.length?S[0].date+"–"+S[S.length-1].date:"데이터 없음")+" · "+D.sessions.length+" 세션 · FTP 133 W";
 const decRows=S.filter(x=>x.dec!=null&&x.dur>=1.5);
 const decWithin=decRows.filter(x=>Math.abs(x.dec)<=3).length;
