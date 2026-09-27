@@ -219,7 +219,7 @@ document.getElementById("gradeN").textContent=gradeSteep?gradeSteep.n:"—";
 
 document.getElementById("firstEff").textContent=ee.length?ee[0].p:"—";
 document.getElementById("lastEff").textContent=ee.length?ee[ee.length-1].p:"—";
-const z=S.find(x=>x.date==="2026-09-20");
+const z=S.slice().reverse().find(x=>x.env==="I"&&x.dur>=1.5);
 document.getElementById("z2").textContent=z?(z.p+"W / HR "+z.hr+" / NP "+z.np+" / decoupling "+z.dec+"%"):"—";
 const band=S.filter(x=>x.p!=null&&x.p>=80&&x.p<=100);
 const im=band.filter(x=>x.env==="I").map(x=>x.hr).sort((a,b)=>a-b),om=band.filter(x=>x.env==="O").map(x=>x.hr).sort((a,b)=>a-b);
