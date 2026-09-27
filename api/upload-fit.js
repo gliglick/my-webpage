@@ -125,11 +125,38 @@ module.exports = async (req,res) => {
   const token=process.env.GITHUB_TOKEN;
   if(!token) return res.status(500).json({error:"Vercel 환경변수 GITHUB_TOKEN이 설정되지 않았습니다."});
   try {
-    const form=await req.formData();
-    const file=form.get("fit");
-    if(!file || typeof file.arrayBuffer!=="function") return res.status(400).json({error:"FIT 파일을 선택하세요."});
-    if(file.size>20*1024*1024) return res.status(413).json({error:"파일은 20MB 이하만 업로드할 수 있습니다."});
-    const session=readFit(Buffer.from(await file.arrayBuffer()));
+    // Vercel Node.js functions receive IncomingMessage, not the Web Request API.
+    const contentType=req.headers["content-type"]||"";
+    const boundaryMatch=contentType.match(/multipart\/form-data\s*;\s*boundary=(?:"([^"]+)"|([^;]+))/i);
+    if(!boundaryMatch) return res.status(400).json({error:"multipart/form-data 요청이 아닙니다."});
+    const boundary=Buffer.from("--"+(boundaryMatch[1]||boundaryMatch[2]));
+    const chunks=[]; let total=0;
+    for await (const chunk of req) {
+      total+=chunk.length;
+      if(total>21*1024*1024) return res.status(413).json({error:"파일은 20MB 이하만 업로드할 수 있습니다."});
+      chunks.push(chunk);
+    }
+    const body=Buffer.concat(chunks);
+    let fileBuffer=null;
+    let pos=0;
+    while((pos=body.indexOf(boundary,pos))!==-1) {
+      pos+=boundary.length;
+      if(body[pos]===45&&body[pos+1]===45) break;
+      if(body[pos]===13&&body[pos+1]===10) pos+=2;
+      const headerEnd=body.indexOf(Buffer.from("\r\n\r\n"),pos);
+      if(headerEnd<0) break;
+      const headers=body.toString("utf8",pos,headerEnd);
+      const dataStart=headerEnd+4;
+      const next=body.indexOf(boundary,dataStart);
+      if(next<0) break;
+      let dataEnd=next;
+      if(dataEnd>=2&&body[dataEnd-2]===13&&body[dataEnd-1]===10)dataEnd-=2;
+      if(/name="fit"/i.test(headers)) { fileBuffer=body.subarray(dataStart,dataEnd); break; }
+      pos=next;
+    }
+    if(!fileBuffer || fileBuffer.length===0) return res.status(400).json({error:"FIT 파일을 선택하세요."});
+    if(fileBuffer.length>20*1024*1024) return res.status(413).json({error:"파일은 20MB 이하만 업로드할 수 있습니다."});
+    const session=readFit(fileBuffer);
     const api="https://api.github.com/repos/"+REPO+"/contents/"+DASHBOARD_PATH;
     const headers={Authorization:"Bearer "+token,Accept:"application/vnd.github+json","X-GitHub-Api-Version":"2022-11-28"};
     const get=await fetch(api+"?ref="+BRANCH,{headers});
