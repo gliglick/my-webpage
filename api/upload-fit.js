@@ -68,7 +68,7 @@ function readFit(buffer) {
       const obj=parseData(d); collect(d.global,obj);
     }
   }
-  function parseData(d) {
+  function parseData(d, compressed = false) {
     const o={};
     for(const f of d.fields) {
       const b=buffer.subarray(p,Math.min(p+f.size,end)); p+=f.size;
