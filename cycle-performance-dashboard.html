@@ -203,12 +203,16 @@ new Chart(document.getElementById("grade"),{type:"bar",data:{labels:D.grades.map
 const p20Rows=S.filter(x=>x.p20!=null); const best=p20Rows.length?p20Rows.reduce((a,b)=>a.p20>b.p20?a:b):null;
 const ee=E;
 document.getElementById("best20").textContent=best?best.p20:"—";
-document.getElementById("best20Insight").textContent=best?best.p20:"—";
 const latestRide=S.length?S.reduce((a,b)=>a.date>b.date?a:b):null;
-document.getElementById("latestRideInsight").textContent=latestRide
- ? latestRide.date+" · "+(latestRide.title||"라이딩")+" · "+(latestRide.dist!=null?(latestRide.dist>=1000?(latestRide.dist/1000).toFixed(1)+"km":latestRide.dist.toFixed(1)+"m"):"거리 미상")+" · "+(latestRide.dur!=null?latestRide.dur.toFixed(2)+"시간":"시간 미상")+" · 평균 "+(latestRide.p!=null?latestRide.p+"W":"Power 미상")+" · 20분 "+(latestRide.p20!=null?latestRide.p20+"W":"계산 불가")
- : "라이딩 데이터 없음";
 
+
+document.getElementById("dashboardSummary").textContent=(S.length?S[0].date+"–"+S[S.length-1].date:"데이터 없음")+" · "+D.sessions.length+" 세션 · FTP 133 W";
+const decRows=S.filter(x=>x.dec!=null&&x.dur>=1.5);
+const decWithin=decRows.filter(x=>Math.abs(x.dec)<=3).length;
+const decLatest=decRows.length?decRows[decRows.length-1]:null;
+const gradeLow=D.grades.find(x=>x.grade==="0~2%");
+const gradeHigh=D.grades.find(x=>x.grade==="4~6%");
+const gradeSteep=D.grades.find(x=>x.grade==="6~8%");
 function medVals(rows,key){const a=rows.map(x=>Number(x[key])).filter(Number.isFinite).sort((a,b)=>a-b);return a.length?(a.length%2?a[(a.length-1)/2]:(a[a.length/2-1]+a[a.length/2])/2):null;}
 function meanVals(rows,key){const a=rows.map(x=>Number(x[key])).filter(Number.isFinite);return a.length?a.reduce((s,v)=>s+v,0)/a.length:null;}
 function fmt(v,d=1){return v==null?"자료 부족":v.toFixed(d);}
@@ -235,18 +239,7 @@ document.getElementById("insightEff").innerHTML="<b>심박 대비 유산소 출�
 document.getElementById("insightDec").innerHTML="<b>장시간 지속력</b><br>"+(validDec.length?("장시간 세션 "+validDec.length+"회 중 "+validDec.filter(x=>Math.abs(x.dec)<=3).length+"회가 ±3% 이내. 최근 값 "+fmt(validDec[validDec.length-1].dec,1)+"%."):"장시간 세션의 decoupling 데이터가 없어 지속력을 판단할 수 없습니다.")+"<br>"+(tDec?(tDec.delta>1?"최근 decoupling이 커졌습니다. 다음 장시간 Z2는 파워를 낮추고 수분·냉각·초반 페이스를 점검하세요.":tDec.delta< -1?"최근 decoupling이 줄었습니다. 같은 파워·시간 조건에서도 반복되는지 확인하며 Z2 시간을 점진적으로 늘릴 수 있습니다.":"최근 비교에서는 뚜렷한 변화가 없습니다. 동일한 조건으로 추세를 더 쌓으세요."):"판단 전 동일한 조건의 장시간 세션을 더 확보하세요.");
 document.getElementById("insightGrade").innerHTML="<b>등반 지표의 해석</b><br>"+(gradeLow&&gradeHigh?"0–2% 중앙값 "+fmt(gradeLow.wkg,2)+" W/kg, 4–6% "+fmt(gradeHigh.wkg,2)+" W/kg.":"경사별 자료가 충분하지 않습니다.")+"<br>이 구간별 요약은 FIT 업로드만으로 새로 계산되지 않는 기존 표본일 수 있습니다. 표본 수가 적으면 등반 체력의 추세로 단정하지 말고, 같은 오르막의 시간·파워·심박을 누적 비교해야 합니다.";
 
-document.getElementById("dashboardSummary").textContent=(S.length?S[0].date+"–"+S[S.length-1].date:"데이터 없음")+" · "+D.sessions.length+" 세션 · FTP 133 W";
-const decRows=S.filter(x=>x.dec!=null&&x.dur>=1.5);
-const decWithin=decRows.filter(x=>Math.abs(x.dec)<=3).length;
-document.getElementById("decWithin").textContent=decRows.length?decWithin+"/"+decRows.length+"회 ("+(100*decWithin/decRows.length).toFixed(0)+"%)":"자료 부족";
-const decLatest=decRows.length?decRows[decRows.length-1]:null;
-document.getElementById("decLatest").textContent=decLatest?decLatest.d+" · "+(decLatest.dec>0?"+":"")+decLatest.dec.toFixed(1)+"%":"자료 부족";
-const gradeLow=D.grades.find(x=>x.grade==="0~2%");
-const gradeHigh=D.grades.find(x=>x.grade==="4~6%");
-document.getElementById("gradeLow").textContent=gradeLow?gradeLow.wkg.toFixed(2):"—";
-document.getElementById("gradeHigh").textContent=gradeHigh?gradeHigh.wkg.toFixed(2):"—";
-const gradeSteep=D.grades.find(x=>x.grade==="6~8%");
-document.getElementById("gradeN").textContent=gradeSteep?gradeSteep.n:"—";
+
 
 document.getElementById("firstEff").textContent=ee.length?ee[0].p:"—";
 document.getElementById("lastEff").textContent=ee.length?ee[ee.length-1].p:"—";
