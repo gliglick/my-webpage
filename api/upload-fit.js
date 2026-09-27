@@ -138,7 +138,7 @@ function readFit(buffer) {
     for(let i=0;i<samples.length;i++) {
       sum+=samples[i].p;
       if(i>=1200) sum-=samples[i-1200].p;
-      if(i>=1199) p20=Math.max(p20??0,sum/1200);
+      if(i>=1199 && samples[i].t-samples[i-1199].t===1199) p20=Math.max(p20??0,sum/1200);
     }
     if(p20!==null) p20=Math.round(p20*10)/10;
   }
