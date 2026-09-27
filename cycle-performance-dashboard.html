@@ -21,7 +21,7 @@ h1{color:#ffffff}
 #tbl tr.selected-row td{background:#f2c94c !important;color:#111827 !important;font-weight:800;box-shadow:inset 0 0 0 1px rgba(255,255,255,.25)}
 #tbl tr{transition:background .15s ease}
 </style></head><body><main>
-<h1>Cycle Performance Lab</h1><div class="sub">2026.06.03–2026.09.23 · 33 FIT · 32 논리 세션 · FTP 133 W</div>
+<h1>Cycle Performance Lab</h1><div class="sub" id="dashboardSummary">라이딩 데이터 요약을 계산 중…</div>
 
 <div class="card" style="margin-top:14px"><h2>FIT 파일 추가</h2><div class="sub">Garmin FIT 파일을 선택해 대시보드에 추가합니다.</div><input id="fitFile" type="file" accept=".fit" style="margin-top:12px"><button id="fitUploadButton" type="button" style="margin-left:10px;background:#f2c94c;color:#111827;border:0;border-radius:8px;padding:10px 16px;font-weight:800;cursor:pointer">FIT 업로드</button><span id="fitUploadStatus" role="status" style="margin-left:10px;color:#aab8c9"></span></div>
 <div class="grid">
@@ -37,11 +37,11 @@ h1{color:#ffffff}
 
 <div class="grid">
 <div class="card"><h2>심박수 대비 Power 추이</h2><div class="sub">HR 140–165 bpm 세션 · 평균 Power(W) · 실내 CYAN · 실외 MAGENTA · 장기 추세 PURPLE</div><div class="chartbox"><canvas id="eff"></canvas></div><div class="insight"><b>인사이트</b><br>유산소 구간에서 비교 가능한 <b>HR 140–165 bpm</b> 세션만 추려 날짜별 평균 Power를 연결합니다.<br>Y축은 <b>실제 평균 Power(W)</b>이며, 같은 범위의 심박에서 더 높은 Power를 낼수록 유산소 출력이 좋아진 것으로 해석합니다.</div></div>
-<div class="card"><h2>장시간 Aerobic Decoupling</h2><div class="sub">실내 Z2 유사 세션 · 0%에 가까울수록 후반 효율 저하가 작음</div><div class="chartbox"><canvas id="dec"></canvas></div><div class="insight"><b>인사이트</b><br>장시간 Z2 세션의 대부분은 <b>±3% 안팎</b>으로, 최근 9/17은 -1.0%, 9/20은 +0.1%로 후반 효율이 안정적입니다.<br>단일 이상치보다 90–120분 세션에서 0%에 가까운 상태가 반복되는지를 보는 것이 중요합니다.</div></div>
+<div class="card"><h2>장시간 Aerobic Decoupling</h2><div class="sub">실내 Z2 유사 세션 · 0%에 가까울수록 후반 효율 저하가 작음</div><div class="chartbox"><canvas id="dec"></canvas></div><div class="insight"><b>인사이트</b><br>유효한 장시간 세션 중 <b><span id="decWithin">—</span></b>이(가) ±3% 이내입니다. 가장 최근 측정은 <b><span id="decLatest">—</span></b>입니다.<br>단일 이상치보다 90–120분 세션에서 0%에 가까운 상태가 반복되는지를 보는 것이 중요합니다.</div></div>
 </div>
 
 <div class="grid">
-<div class="card"><h2>실외 등반 퍼포먼스</h2><div class="sub">경사별 median W/kg · 막대에 마우스/터치하면 Power·HR·표본 표시</div><div class="chartbox"><canvas id="grade"></canvas></div><div class="insight"><b>인사이트</b><br>경사가 높아질수록 Power가 증가하며, 0~2% 약 <b>1.76 W/kg</b>에서 4~6% 약 <b>2.55 W/kg</b>로 상승합니다.<br>6~8% 구간은 표본이 60개로 적어 추세 판단에는 주의가 필요합니다.</div></div>
+<div class="card"><h2>실외 등반 퍼포먼스</h2><div class="sub">경사별 median W/kg · 막대에 마우스/터치하면 Power·HR·표본 표시</div><div class="chartbox"><canvas id="grade"></canvas></div><div class="insight"><b>인사이트</b><br>경사 구간별 중앙값은 0~2%에서 <b><span id="gradeLow">—</span> W/kg</b>, 4~6%에서 <b><span id="gradeHigh">—</span> W/kg</b>입니다.<br>6~8% 구간의 표본은 <b><span id="gradeN">—</span>개</b>이므로 다른 구간과 비교할 때 표본 수를 함께 확인하세요.</div></div>
 <div class="card"><h2>현재 사이클 퍼포먼스 판독</h2><div class="readout">
 <p><b>Power:</b> 현재 최고 20분 Power는 <span id="best20"></span> W.</p>
 <p><b>Aerobic Power:</b> HR 140–165 구간에서 <span id="firstEff"></span> W → <span id="lastEff"></span> W.</p>
@@ -204,6 +204,19 @@ const p20Rows=S.filter(x=>x.p20!=null); const best=p20Rows.length?p20Rows.reduce
 const ee=E;
 document.getElementById("best20").textContent=best?best.p20:"—";
 document.getElementById("best20Insight").textContent=best?best.p20:"—";
+document.getElementById("dashboardSummary").textContent=(S.length?S[0].date+"–"+S[S.length-1].date:"데이터 없음")+" · "+D.sessions.length+" 세션 · FTP 133 W";
+const decRows=S.filter(x=>x.dec!=null&&x.dur>=1.5);
+const decWithin=decRows.filter(x=>Math.abs(x.dec)<=3).length;
+document.getElementById("decWithin").textContent=decRows.length?decWithin+"/"+decRows.length+"회 ("+(100*decWithin/decRows.length).toFixed(0)+"%)":"자료 부족";
+const decLatest=decRows.length?decRows[decRows.length-1]:null;
+document.getElementById("decLatest").textContent=decLatest?decLatest.d+" · "+(decLatest.dec>0?"+":"")+decLatest.dec.toFixed(1)+"%":"자료 부족";
+const gradeLow=D.grades.find(x=>x.grade==="0~2%");
+const gradeHigh=D.grades.find(x=>x.grade==="4~6%");
+document.getElementById("gradeLow").textContent=gradeLow?gradeLow.wkg.toFixed(2):"—";
+document.getElementById("gradeHigh").textContent=gradeHigh?gradeHigh.wkg.toFixed(2):"—";
+const gradeSteep=D.grades.find(x=>x.grade==="6~8%");
+document.getElementById("gradeN").textContent=gradeSteep?gradeSteep.n:"—";
+
 document.getElementById("firstEff").textContent=ee.length?ee[0].p:"—";
 document.getElementById("lastEff").textContent=ee.length?ee[ee.length-1].p:"—";
 const z=S.find(x=>x.date==="2026-09-20");
