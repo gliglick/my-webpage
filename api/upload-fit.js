@@ -5,114 +5,152 @@ const DASHBOARD_PATH = "cycle-performance-dashboard.html";
 const FTP = 133;
 
 function readFit(buffer) {
-  if (buffer.length < 14 || buffer.toString("ascii", 8, 12) !== ".FIT") throw new Error("유효한 FIT 파일이 아닙니다.");
+  if (buffer.length < 14 || buffer.toString("ascii", 8, 12) !== ".FIT") {
+    throw new Error("유효한 FIT 파일이 아닙니다.");
+  }
   const headerSize = buffer[0];
   const dataSize = buffer.readUInt32LE(4);
-  let p = headerSize, end = Math.min(headerSize + dataSize, buffer.length);
+  const end = Math.min(headerSize + dataSize, buffer.length);
+  let p = headerSize;
   const defs = {};
   const sessions = [];
   const records = [];
+  let lastTimestamp = null;
+
   const baseInfo = {
-    0x00:{size:1,type:"enum"},0x01:{size:1,type:"sint8"},0x02:{size:1,type:"uint8"},
-    0x83:{size:2,type:"sint16"},0x84:{size:2,type:"uint16"},0x85:{size:4,type:"sint32"},
-    0x86:{size:4,type:"uint32"},0x07:{size:1,type:"string"},0x88:{size:4,type:"float32"},
-    0x89:{size:8,type:"float64"},0x0A:{size:1,type:"uint8z"},0x8B:{size:2,type:"uint16z"},
-    0x8C:{size:4,type:"uint32z"},0x0D:{size:1,type:"byte"},0x8E:{size:8,type:"sint64"},
-    0x8F:{size:8,type:"uint64"},0x90:{size:8,type:"uint64z"}
+    0x00:{size:1}, 0x01:{size:1}, 0x02:{size:1}, 0x83:{size:2},
+    0x84:{size:2}, 0x85:{size:4}, 0x86:{size:4}, 0x07:{size:1},
+    0x88:{size:4}, 0x89:{size:8}, 0x0A:{size:1}, 0x8B:{size:2},
+    0x8C:{size:4}, 0x0D:{size:1}, 0x8E:{size:8}, 0x8F:{size:8},
+    0x90:{size:8}
   };
-  function val(b, type, arch) {
+
+  function readValue(b, type, arch) {
     const le = arch === 0;
     if (!b.length) return null;
-    if (type === "string") return b.toString("utf8").replace(/\0.*$/s,"").trim() || null;
-    if (type === "byte") return b[0];
-    const base = baseInfo[type];
-    if (!base || b.length < base.size) return null;
+    if (type === 0x07) return b.toString("utf8").replace(/\0.*$/s,"").trim() || null;
+    if (type === 0x0D) return b[0];
     try {
       switch(type) {
         case 0x00: case 0x02: return b[0] === 0xff ? null : b[0];
         case 0x01: return b.readInt8(0);
-        case 0x83: return b[le?"readInt16LE":"readInt16BE"](0) === 0x7fff ? null : b[le?"readInt16LE":"readInt16BE"](0);
-        case 0x84: return b[le?"readUInt16LE":"readUInt16BE"](0) === 0xffff ? null : b[le?"readUInt16LE":"readUInt16BE"](0);
-        case 0x85: return b[le?"readInt32LE":"readInt32BE"](0) === 0x7fffffff ? null : b[le?"readInt32LE":"readInt32BE"](0);
-        case 0x86: return b[le?"readUInt32LE":"readUInt32BE"](0) === 0xffffffff ? null : b[le?"readUInt32LE":"readUInt32BE"](0);
-        case 0x0A: return b[0] === 0 ? null : b[0];
+        case 0x83: { const v=b[le?"readInt16LE":"readInt16BE"](0); return v===0x7fff?null:v; }
+        case 0x84: { const v=b[le?"readUInt16LE":"readUInt16BE"](0); return v===0xffff?null:v; }
+        case 0x85: { const v=b[le?"readInt32LE":"readInt32BE"](0); return v===0x7fffffff?null:v; }
+        case 0x86: { const v=b[le?"readUInt32LE":"readUInt32BE"](0); return v===0xffffffff?null:v; }
+        case 0x0A: return b[0]===0?null:b[0];
         case 0x8B: return b[le?"readUInt16LE":"readUInt16BE"](0);
         case 0x8C: return b[le?"readUInt32LE":"readUInt32BE"](0);
         case 0x88: return b[le?"readFloatLE":"readFloatBE"](0);
         case 0x89: return b[le?"readDoubleLE":"readDoubleBE"](0);
+        case 0x8E: return b[le?"readBigInt64LE":"readBigInt64BE"](0).toString();
+        case 0x8F: case 0x90: return b[le?"readBigUInt64LE":"readBigUInt64BE"](0).toString();
         default: return null;
       }
     } catch { return null; }
   }
-  while (p < end) {
-    const h = buffer[p++];
-    if (h & 0x80) { // compressed timestamp header
-      const local = (h >> 5) & 0x03;
-      const d = defs[local]; if (!d) break;
-      const obj = parseData(d, true);
-      collect(d.global, obj);
+
+  function parseData(def, compressedOffset=null) {
+    const obj={};
+    for(const field of def.fields) {
+      const bytes=buffer.subarray(p,Math.min(p+field.size,end)); p+=field.size;
+      const type=field.type&0xff, info=baseInfo[type];
+      if(info && field.size>info.size) {
+        const arr=[];
+        for(let i=0;i+info.size<=bytes.length;i+=info.size) arr.push(readValue(bytes.subarray(i,i+info.size),type,def.arch));
+        obj[field.num]=arr.length===1?arr[0]:arr;
+      } else obj[field.num]=readValue(bytes,type,def.arch);
+    }
+    for(const field of (def.dev||[])) p+=field.size;
+    if(compressedOffset!==null) {
+      if(lastTimestamp===null) throw new Error("압축 타임스탬프의 기준 시간이 없습니다.");
+      let ts=(lastTimestamp & ~0x1f) | compressedOffset;
+      if(ts<lastTimestamp) ts+=0x20;
+      obj[253]=ts;
+      lastTimestamp=ts;
+    } else if(Number.isFinite(obj[253])) {
+      lastTimestamp=obj[253];
+    }
+    return obj;
+  }
+
+  function collect(global,obj) {
+    if(global===18) sessions.push(obj);
+    if(global===20) records.push(obj);
+  }
+
+  while(p<end) {
+    const h=buffer[p++];
+    if(h&0x80) {
+      const local=(h>>5)&0x03, offset=h&0x1f, def=defs[local];
+      if(!def) throw new Error("FIT 압축 레코드 정의가 없습니다.");
+      collect(def.global,parseData(def,offset));
       continue;
     }
-    const local = h & 0x0f;
-    if (h & 0x40) {
-      if (p + 5 > end) break;
-      p++; const arch = buffer[p++];
-      const global = arch === 0 ? buffer.readUInt16LE(p) : buffer.readUInt16BE(p); p += 2;
-      const n = buffer[p++], fields = [];
-      for(let i=0;i<n;i++){ if(p+3>end) break; fields.push({num:buffer[p++],size:buffer[p++],type:buffer[p++]}); }
-      let dev=[];
-      if(h & 0x20) { const nd=buffer[p++]; for(let i=0;i<nd;i++){dev.push({size:buffer[p+1]});p+=3;} }
+    const local=h&0x0f;
+    if(h&0x40) {
+      if(p+5>end) break;
+      p++; const arch=buffer[p++];
+      const global=arch===0?buffer.readUInt16LE(p):buffer.readUInt16BE(p); p+=2;
+      const n=buffer[p++], fields=[];
+      for(let i=0;i<n;i++) {
+        if(p+3>end) throw new Error("FIT 필드 정의가 잘렸습니다.");
+        fields.push({num:buffer[p++],size:buffer[p++],type:buffer[p++]});
+      }
+      const dev=[];
+      if(h&0x20) {
+        const nd=buffer[p++];
+        for(let i=0;i<nd;i++){dev.push({size:buffer[p+1]});p+=3;}
+      }
       defs[local]={global,arch,fields,dev};
     } else {
-      const d=defs[local]; if(!d) break;
-      const obj=parseData(d); collect(d.global,obj);
+      const def=defs[local];
+      if(!def) throw new Error("FIT 데이터 정의가 없습니다.");
+      collect(def.global,parseData(def));
     }
   }
-  function parseData(d, compressed = false) {
-    const o={};
-    for(const f of d.fields) {
-      const b=buffer.subarray(p,Math.min(p+f.size,end)); p+=f.size;
-      const base=f.type & 0xff;
-      const info=baseInfo[base];
-      if(info && f.size>info.size) {
-        const arr=[]; for(let i=0;i+info.size<=b.length;i+=info.size) arr.push(val(b.subarray(i,i+info.size),base,d.arch));
-        o[f.num]=arr.length===1?arr[0]:arr;
-      } else o[f.num]=val(b,base,d.arch);
-    }
-    for(const f of (d.dev||[])) p+=f.size;
-    return o;
-  }
-  function collect(global,o) {
-    if(global===18) sessions.push(o);
-    if(global===20) records.push(o);
-  }
+
   const s=sessions[sessions.length-1];
   if(!s) throw new Error("FIT 파일에서 세션 요약을 찾지 못했습니다.");
   const fitEpoch=Date.UTC(1989,11,31)/1000;
-  const ts=s[2] != null ? new Date((s[2]+fitEpoch)*1000) : new Date();
-  const date=ts.toISOString().slice(0,10);
-  const dur=(s[8] ?? s[7] ?? 0)/1000/3600;
-  const dist=(s[9] ?? 0)/100;
-  const power=s[20] ?? null, hr=s[16] ?? null;
-  let p20=null;
-  const pts=records.filter(r=>r[253]!=null && r[7]!=null).map(r=>({t:r[253],p:r[7]})).sort((a,b)=>a.t-b.t);
-  if(pts.length>1) {
-    let j=0,sum=0,best=0;
-    for(let i=0;i<pts.length;i++){
-      sum+=pts[i].p;
-      while(j<=i && pts[i].t-pts[j].t>1200){sum-=pts[j].p;j++;}
-      if(pts[i].t-pts[j].t>=1190) best=Math.max(best,sum/(i-j+1));
-    }
-    if(best>0) p20=Math.round(best*10)/10;
+  const startTime=s[2] ?? s[253];
+  const date=startTime!=null?new Date((startTime+fitEpoch)*1000).toISOString().slice(0,10):new Date().toISOString().slice(0,10);
+  const dur=(s[8]??s[7]??0)/1000/3600;
+  const dist=(s[9]??0)/100;
+  const sport=s[5]??2;
+
+  // Build one-second power samples from timestamped record messages.
+  // FIT compressed timestamp headers are reconstructed above; long recording gaps
+  // are not interpolated, so they cannot create artificial 20-minute efforts.
+  const pts=records
+    .filter(r=>Number.isFinite(r[253]) && Number.isFinite(r[7]))
+    .map(r=>({t:r[253],p:Number(r[7])}))
+    .sort((a,b)=>a.t-b.t);
+  const samples=[];
+  for(let i=0;i<pts.length-1;i++) {
+    const a=pts[i], b=pts[i+1], gap=b.t-a.t;
+    if(gap<=0 || gap>3) continue;
+    for(let sec=0;sec<gap;sec++) samples.push({t:a.t+sec,p:a.p});
   }
-  const sport=s[5] ?? 2;
+  let p20=null;
+  if(samples.length>=1200) {
+    let sum=0;
+    for(let i=0;i<samples.length;i++) {
+      sum+=samples[i].p;
+      if(i>=1200) sum-=samples[i-1200].p;
+      if(i>=1199) p20=Math.max(p20??0,sum/1200);
+    }
+    if(p20!==null) p20=Math.round(p20*10)/10;
+  }
+
   return {
     d:date.slice(5),date,env:(sport===2||sport===1)?"O":"I",
-    title:"FIT 업로드 · "+date,hr:hr==null?null:Number(hr),
-    p:power==null?null:Number(power),np:s[34]==null?null:Number(s[34]),
-    p20,tss:null,dur:Number(dur.toFixed(2)),dist:Number(dist.toFixed(1)),
+    title:"FIT 업로드 · "+date,
+    hr:s[16]==null?null:Number(s[16]), p:s[20]==null?null:Number(s[20]),
+    np:s[34]==null?null:Number(s[34]), p20,
+    tss:null,dur:Number(dur.toFixed(2)),dist:Number(dist.toFixed(1)),
     eff:null,dec:null,merged:false,partial:false,
-    _dedupe: date+"-"+Math.round((s[2]||0))+"-"+Math.round(dist)
+    _dedupe:date+"-"+Math.round(startTime??0)+"-"+Math.round(dist)
   };
 }
 
@@ -166,11 +204,16 @@ module.exports = async (req,res) => {
     const match=html.match(/const D=(\{[\s\S]*?\});\s*\nconst S=/);
     if(!match) throw new Error("대시보드 데이터 영역을 찾지 못했습니다.");
     const data=JSON.parse(match[1]);
-    const key=session._dedupe;
-    const exists=data.sessions.some(x=>x.date===session.date && Math.abs((x.dist||0)-session.dist)<100);
-    if(exists) return res.status(200).json({message:"같은 날짜·거리의 세션이 이미 있어 중복 추가하지 않았습니다.",session});
+    const existingIndex=data.sessions.findIndex(x=>x.date===session.date && Math.abs((x.dist||0)-session.dist)<100);
     delete session._dedupe;
-    data.sessions.push(session);
+    if(existingIndex>=0) {
+      // Re-uploading the same ride refreshes its FIT-derived metrics instead of
+      // silently retaining a previously miscalculated 20-minute power.
+      const previous=data.sessions[existingIndex];
+      data.sessions[existingIndex]={...previous,...session,title:previous.title||session.title};
+    } else {
+      data.sessions.push(session);
+    }
     data.sessions.sort((a,b)=>a.date.localeCompare(b.date));
     const next=html.replace(match[1],JSON.stringify(data));
     const put=await fetch(api,{method:"PUT",headers:{...headers,"Content-Type":"application/json"},body:JSON.stringify({
@@ -178,7 +221,7 @@ module.exports = async (req,res) => {
     })});
     const result=await put.json();
     if(!put.ok) throw new Error(result.message||"GitHub에 저장하지 못했습니다.");
-    return res.status(200).json({message:"FIT 세션을 대시보드에 추가했습니다. Vercel 배포가 완료되면 반영됩니다.",session});
+    return res.status(200).json({message:existingIndex>=0?"기존 라이딩의 FIT 지표를 다시 계산해 갱신했습니다.":"FIT 세션을 대시보드에 추가했습니다. Vercel 배포가 완료되면 반영됩니다.",session});
   } catch(e) {
     return res.status(400).json({error:e.message||"FIT 업로드 처리 중 오류가 발생했습니다."});
   }
