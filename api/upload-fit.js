@@ -72,7 +72,7 @@ function readFit(buffer) {
     const o={};
     for(const f of d.fields) {
       const b=buffer.subarray(p,Math.min(p+f.size,end)); p+=f.size;
-      const base=f.type & 0x1f;
+      const base=f.type & 0xff;
       const info=baseInfo[base];
       if(info && f.size>info.size) {
         const arr=[]; for(let i=0;i+info.size<=b.length;i+=info.size) arr.push(val(b.subarray(i,i+info.size),base,d.arch));
@@ -89,11 +89,11 @@ function readFit(buffer) {
   const s=sessions[sessions.length-1];
   if(!s) throw new Error("FIT 파일에서 세션 요약을 찾지 못했습니다.");
   const fitEpoch=Date.UTC(1989,11,31)/1000;
-  const ts=s[2] != null ? new Date((s[2]+fitEpoch)*1000) : new Date();
+  const ts=s[4] != null ? new Date((s[4]+fitEpoch)*1000) : new Date();
   const date=ts.toISOString().slice(0,10);
-  const dur=(s[8] ?? s[7] ?? 0)/1000/3600;
-  const dist=(s[9] ?? 0)/100;
-  const power=s[20] ?? null, hr=s[16] ?? null;
+  const dur=(s[9] ?? s[10] ?? 0)/1000/3600;
+  const dist=(s[11] ?? 0)/100;
+  const power=s[21] ?? null, hr=s[17] ?? null;
   let p20=null;
   const pts=records.filter(r=>r[253]!=null && r[7]!=null).map(r=>({t:r[253],p:r[7]})).sort((a,b)=>a.t-b.t);
   if(pts.length>1) {
@@ -105,14 +105,14 @@ function readFit(buffer) {
     }
     if(best>0) p20=Math.round(best*10)/10;
   }
-  const sport=s[5] ?? 2;
+  const sport=s[7] ?? 2;
   return {
     d:date.slice(5),date,env:(sport===2||sport===1)?"O":"I",
     title:"FIT 업로드 · "+date,hr:hr==null?null:Number(hr),
-    p:power==null?null:Number(power),np:s[27]==null?null:Number(s[27]),
+    p:power==null?null:Number(power),np:s[28]==null?null:Number(s[28]),
     p20,tss:null,dur:Number(dur.toFixed(2)),dist:Number(dist.toFixed(1)),
     eff:null,dec:null,merged:false,partial:false,
-    _dedupe: date+"-"+Math.round((s[2]||0))+"-"+Math.round(dist)
+    _dedupe: date+"-"+Math.round((s[4]||0))+"-"+Math.round(dist)
   };
 }
 
