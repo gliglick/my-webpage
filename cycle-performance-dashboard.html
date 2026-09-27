@@ -227,4 +227,22 @@ document.getElementById("weeklyTbl").innerHTML=Object.keys(weekMap).sort().rever
 document.getElementById("tbl").innerHTML=S.slice().reverse().map(x=>
  "<tr data-date=\""+x.date+"\"><td>"+x.d+"</td><td>"+(x.env==="I"?"실내":"실외")+"</td><td>"+x.title+"</td><td>"+x.dur.toFixed(1)+"h</td><td>"+x.dist.toFixed(1)+"</td><td>"+(x.hr??"—")+"</td><td>"+(x.p??"—")+"</td><td>"+(x.np??"—")+"</td><td>"+(x.p20??"—")+"</td><td>"+(x.tss??"—")+"</td><td>"+(x.dec!=null?x.dec.toFixed(2)+"%":"—")+"</td></tr>"
 ).join("");
+
+document.getElementById("fitUploadButton")?.addEventListener("click",async()=>{
+ const file=document.getElementById("fitFile").files[0];
+ const status=document.getElementById("fitUploadStatus");
+ const button=document.getElementById("fitUploadButton");
+ if(!file){status.textContent="먼저 FIT 파일을 선택하세요.";return;}
+ const data=new FormData();data.append("fit",file);
+ button.disabled=true;button.textContent="업로드 중…";status.textContent="파일 처리 중";
+ try{
+  const response=await fetch("/api/upload-fit",{method:"POST",body:data});
+  const result=await response.json();
+  if(!response.ok)throw new Error(result.error||"업로드 실패");
+  status.textContent=result.message||"업로드 완료";
+  if(result.session)status.textContent+=" · "+result.session.date+" · "+result.session.dur+"시간";
+  if(!result.message?.includes("이미 있어"))setTimeout(()=>location.reload(),2500);
+ }catch(error){status.textContent="오류: "+error.message;}
+ finally{button.disabled=false;button.textContent="FIT 업로드";}
+});
 </script></main></body></html>
