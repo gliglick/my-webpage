@@ -24,6 +24,7 @@ h1{color:#ffffff}
 <h1>Cycle Performance Lab</h1><div class="sub" id="dashboardSummary">라이딩 데이터 요약을 계산 중…</div>
 
 <div class="card" style="margin-top:14px"><h2>FIT 파일 추가</h2><div class="sub">Garmin FIT 파일을 선택해 대시보드에 추가합니다.</div><input id="fitFile" type="file" accept=".fit" style="margin-top:12px"><button id="fitUploadButton" type="button" style="margin-left:10px;background:#f2c94c;color:#111827;border:0;border-radius:8px;padding:10px 16px;font-weight:800;cursor:pointer">FIT 업로드</button><span id="fitUploadStatus" role="status" style="margin-left:10px;color:#aab8c9"></span></div>
+<div class="card" style="margin-top:14px"><h2>최근 추세 종합 판단 · 다음 훈련 방향</h2><div class="insight" id="overallInsight">라이딩 데이터를 분석 중…</div><div class="sub">FIT 업로드 때마다 세션 기록을 기준으로 다시 계산합니다. 파워·심박·시간 요약만으로 심박존별 체류시간이나 실제 80/20 분배를 추정하지는 않습니다.</div></div>
 <div class="grid">
 <div class="card"><h2>20분 최고 Power — 최근 90일</h2><div class="sub">개별 라이딩 · 실내 CYAN · 실외 MAGENTA · 장기 추세 PURPLE</div><div class="chartbox"><canvas id="p20"></canvas></div><div class="insight" id="insightP20"><b>추세 분석</b><br>최근 데이터 분석 중…</div>
 <div class="legend"><span><i class="dot c"></i>실내</span><span><i class="dot p"></i>실외</span><span><i class="dot u"></i>90일 추세</span></div></div>
@@ -238,6 +239,19 @@ document.getElementById("insightNPM").innerHTML="<b>월간 부하 강도</b><br>
 document.getElementById("insightEff").innerHTML="<b>심박 대비 유산소 출력</b><br>"+(tEff?"HR 140–165 bpm 범위의 최근 "+tEff.recent.length+"회 평균 Power 중앙값 "+fmt(tEff.r)+"W, 직전 "+fmt(tEff.p)+"W로 "+direction(tEff)+".":"동일 심박 범위의 비교 세션이 부족합니다.")+"<br>실내와 실외를 섞으면 기온·냉각·지형 영향이 큽니다. 가능하면 같은 환경끼리 비교하세요.";
 document.getElementById("insightDec").innerHTML="<b>장시간 지속력</b><br>"+(validDec.length?("장시간 세션 "+validDec.length+"회 중 "+validDec.filter(x=>Math.abs(x.dec)<=3).length+"회가 ±3% 이내. 최근 값 "+fmt(validDec[validDec.length-1].dec,1)+"%."):"장시간 세션의 decoupling 데이터가 없어 지속력을 판단할 수 없습니다.")+"<br>"+(tDec?(tDec.delta>1?"최근 decoupling이 커졌습니다. 다음 장시간 Z2는 파워를 낮추고 수분·냉각·초반 페이스를 점검하세요.":tDec.delta< -1?"최근 decoupling이 줄었습니다. 같은 파워·시간 조건에서도 반복되는지 확인하며 Z2 시간을 점진적으로 늘릴 수 있습니다.":"최근 비교에서는 뚜렷한 변화가 없습니다. 동일한 조건으로 추세를 더 쌓으세요."):"판단 전 동일한 조건의 장시간 세션을 더 확보하세요.");
 document.getElementById("insightGrade").innerHTML="<b>등반 지표의 해석</b><br>"+(gradeLow&&gradeHigh?"0–2% 중앙값 "+fmt(gradeLow.wkg,2)+" W/kg, 4–6% "+fmt(gradeHigh.wkg,2)+" W/kg.":"경사별 자료가 충분하지 않습니다.")+"<br>이 구간별 요약은 FIT 업로드만으로 새로 계산되지 않는 기존 표본일 수 있습니다. 표본 수가 적으면 등반 체력의 추세로 단정하지 말고, 같은 오르막의 시간·파워·심박을 누적 비교해야 합니다.";
+
+const loadDelta=hours30-hoursPrev;
+let nextFocus;
+if(tDec&&tDec.delta>1) nextFocus="다음 핵심 세션은 90–120분의 편안한 Z2로 두고, 초반 파워를 낮춰 후반 드리프트를 확인하세요. 이때 고강도는 회복 상태가 좋을 때만 배치합니다.";
+else if(t20&&t20.delta< -2) nextFocus="최근 20분 파워가 내려갔으므로 당장 강도를 더 올리기보다 회복·수면·누적 부하를 확인하세요. 다음 라이딩은 Z2 중심으로 하고, 컨디션 회복 후 VO₂ 자극을 재개하세요.";
+else if(t20&&t20.delta>1&&tEff&&tEff.delta>1) nextFocus="20분 지속 파워와 동일 심박 구간 출력이 함께 개선되는 신호입니다. 현재 Z2 기반을 유지하고, 주 1회 VO₂ 세션을 충분히 회복 가능한 범위에서 지속하세요.";
+else nextFocus="현재는 추세를 더 쌓는 것이 우선입니다. Z2를 주축으로 유지하고, 주 1회 VO₂ 세션은 품질을 확보하되 피로가 남으면 강도보다 회복을 선택하세요.";
+const loadNote=prior30.length?("최근 30일 라이딩 시간 "+fmt(hours30,1)+"h, 직전 30일 "+fmt(hoursPrev,1)+"h ("+(loadDelta>0?"+":"")+fmt(loadDelta,1)+"h)."):"최근 30일과 비교할 이전 기간의 데이터가 부족합니다.";
+const signals=[];
+if(t20)signals.push("20분 파워 "+(t20.delta>0.5?"상승":t20.delta< -0.5?"하락":"보합"));
+if(tEff)signals.push("동일 HR 구간 출력 "+(tEff.delta>0.5?"상승":tEff.delta< -0.5?"하락":"보합"));
+if(tDec)signals.push("드리프트 "+(tDec.delta>1?"증가":tDec.delta< -1?"감소":"보합"));
+document.getElementById("overallInsight").innerHTML="<b>최근 신호:</b> "+(signals.length?signals.join(" · "):"추세 판정에 필요한 비교 세션 부족")+".<br>"+loadNote+"<br><b>다음 방향:</b> "+nextFocus+"<br><b>해석 한계:</b> 실내·실외 환경과 세션 목적이 섞인 비교는 참고 신호입니다. FIT 요약만으로는 Z1–Z5 체류시간, 실제 훈련 강도 분배, 회복 상태를 확정할 수 없습니다.";
 
 
 
