@@ -118,6 +118,8 @@ function readFit(buffer) {
   const dur=(s[8]??s[7]??0)/1000/3600;
   const dist=(s[9]??0)/100;
   const sport=s[5]??2;
+  const subSport=s[6]??0;
+  // FIT sub_sport: spin=5, indoor_cycling=6. These are indoor even though sport=cycling (2).
 
   // Build one-second power samples from timestamped record messages.
   // FIT compressed timestamp headers are reconstructed above; long recording gaps
@@ -144,7 +146,7 @@ function readFit(buffer) {
   }
 
   return {
-    d:date.slice(5),date,env:(sport===2||sport===1)?"O":"I",
+    d:date.slice(5),date,env:(sport===2&&(subSport===5||subSport===6))?"I":(sport===2?"O":"I"),
     title:"FIT 업로드 · "+date,
     hr:s[16]==null?null:Number(s[16]), p:s[20]==null?null:Number(s[20]),
     np:s[34]==null?null:Number(s[34]), p20,
