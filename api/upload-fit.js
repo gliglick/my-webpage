@@ -114,7 +114,7 @@ function readFit(buffer) {
   if(!s) throw new Error("FIT 파일에서 세션 요약을 찾지 못했습니다.");
   const fitEpoch=Date.UTC(1989,11,31)/1000;
   const startTime=s[2] ?? s[253];
-  const date=startTime!=null?new Date((startTime+fitEpoch)*1000).toISOString().slice(0,10):new Date().toISOString().slice(0,10);
+  const date=startTime!=null?new Intl.DateTimeFormat("en-CA",{timeZone:"Asia/Seoul",year:"numeric",month:"2-digit",day:"2-digit"}).format(new Date((startTime+fitEpoch)*1000)):new Intl.DateTimeFormat("en-CA",{timeZone:"Asia/Seoul",year:"numeric",month:"2-digit",day:"2-digit"}).format(new Date());
   const dur=(s[8]??s[7]??0)/1000/3600;
   const dist=(s[9]??0)/100;
   const sport=s[5]??2;
@@ -152,7 +152,7 @@ function readFit(buffer) {
     np:s[34]==null?null:Number(s[34]), p20,
     tss:null,dur:Number(dur.toFixed(2)),dist:Number(dist.toFixed(1)),
     eff:null,dec:null,merged:false,partial:false,
-    _dedupe:date+"-"+Math.round(startTime??0)+"-"+Math.round(dist)
+    _fitStart:startTime==null?null:Math.round(startTime),_dedupe:date+"-"+Math.round(startTime??0)+"-"+Math.round(dist)
   };
 }
 
@@ -206,13 +206,13 @@ module.exports = async (req,res) => {
     const match=html.match(/const D=(\{[\s\S]*?\});\s*\nconst S=/);
     if(!match) throw new Error("대시보드 데이터 영역을 찾지 못했습니다.");
     const data=JSON.parse(match[1]);
-    const existingIndex=data.sessions.findIndex(x=>x.date===session.date && Math.abs((x.dist||0)-session.dist)<100);
+    const existingIndex=data.sessions.findIndex(x=>((session._fitStart!=null&&x._fitStart!=null&&x._fitStart===session._fitStart)||(Math.abs((x.dist||0)-session.dist)<1.0&&Math.abs((x.dur||0)-session.dur)<0.15)));
     delete session._dedupe;
     if(existingIndex>=0) {
       // Re-uploading the same ride refreshes its FIT-derived metrics instead of
       // silently retaining a previously miscalculated 20-minute power.
       const previous=data.sessions[existingIndex];
-      data.sessions[existingIndex]={...previous,...session,title:previous.title||session.title};
+      data.sessions[existingIndex]={...previous,...session,d:session.date.slice(5),title:previous.title||session.title};
     } else {
       data.sessions.push(session);
     }
